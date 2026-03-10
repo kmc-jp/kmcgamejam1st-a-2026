@@ -22,27 +22,29 @@ public class ClockCon : MonoBehaviour
 	CancellationTokenSource CTSAlarmStop = new CancellationTokenSource();
 	CancellationToken CTAlarmStop;
 
-	private async Task Start()
-	{
-		float alarmTime = Random.Range(1, 1 + MaxAlarmTime);
-		Debug.Log(alarmTime);
-		await UniTask.Delay(TimeSpan.FromSeconds(alarmTime));
-		UniTask AlarmTask = Alarm();
-
-		await UniTask.Delay(3000);//外部から何かのイベントとかを受け取る
-		CTSAlarmStop.Cancel();
-	}
-
 	/// <summary>
 	/// アラームを鳴らす
 	/// </summary>
 	/// <returns></returns>
-	async UniTask Alarm()
+	public async UniTask AlarmStart()
 	{
+		float alarmTime = Random.Range(1, 1 + MaxAlarmTime);
+		Debug.Log(alarmTime);
+		await UniTask.Delay(TimeSpan.FromSeconds(alarmTime));
+
+		//アラームが鳴る
 		Debug.Log("Alarm Start");
 		Transform.position += Jump;
 		CTAlarmStop = CTSAlarmStop.Token;
 		await Alarming(CTAlarmStop);
+	}
+
+	/// <summary>
+	/// アラームを止める
+	/// </summary>
+	public void AlarmStop()
+	{
+		CTSAlarmStop.Cancel();
 	}
 
 	/// <summary>
