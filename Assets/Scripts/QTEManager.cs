@@ -1,6 +1,6 @@
 using UnityEngine;
 using UnityEngine.InputSystem;
-
+using R3;
 enum QTEActionType
 {
     Up,
@@ -32,10 +32,18 @@ class QTEManager: MonoBehaviour
     [SerializeField] private InputAction leftInputAction;
     [SerializeField] private InputAction rightInputAction;
 
+    // UIなどに伝達するためのイベント　R3を使用
+    public Subject<float> onTimeLimitReset = new(); // 制限時間がリフレッシュされたとき
+    public Subject<float> onTimeLimitTick = new(); // 制限時間の更新時
+
     //方向指示機(仮置き)
     [SerializeField] DirectionArrowCon DirectionArrow;
 
 	[SerializeField] GameManager GameManager;
+
+    private void Awake()
+    {
+    }
 
     void OnEnable()
     {
@@ -43,7 +51,6 @@ class QTEManager: MonoBehaviour
         downInputAction?.Enable();
         leftInputAction?.Enable();
         rightInputAction?.Enable();
-
 		SetFirstQTEAction();
 		// 最初の入力アクションにコールバックを設定
 		upInputAction.performed += ctx => OnQTEInput(QTEActionType.Up);
@@ -65,6 +72,7 @@ class QTEManager: MonoBehaviour
         if (qteTimeLimit > 0)
         {
             qteTimeLimit -= Time.deltaTime;
+            onTimeLimitTick.OnNext(qteTimeLimit);
             if (qteTimeLimit <= 0)
             {
                 // 時間切れの処理
@@ -99,6 +107,8 @@ class QTEManager: MonoBehaviour
         // コンボ数に応じて時間制限を短くする
         qteTimeLimit = defaultQTETimeLimit * Mathf.Pow(0.9f, comboCount);
         Debug.Log($"次のQTEアクション: {currentQTEAction}, 時間制限: {qteTimeLimit}");
+        onTimeLimitReset.OnNext(qteTimeLimit);
+        onTimeLimitTick.OnNext(qteTimeLimit);
     }
 
     private void SetFirstQTEAction()
@@ -109,5 +119,8 @@ class QTEManager: MonoBehaviour
 		// 初回は時間無制限
 		qteTimeLimit = -1;
 		Debug.Log($"次のQTEアクション: {currentQTEAction}");
-	}
+        // UIに伝達
+        onTimeLimitReset.OnNext(-1);
+        onTimeLimitTick.OnNext(-1);
+    }
 }
