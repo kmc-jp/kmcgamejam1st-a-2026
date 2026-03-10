@@ -1,4 +1,4 @@
-using Assets.Scenes.gameScene;
+ï»¿using Assets.Scenes.gameScene;
 using Cysharp.Threading.Tasks;
 using UnityEngine;
 
@@ -10,11 +10,11 @@ public class GameManager : MonoBehaviour
 
 	private void Start()
 	{
-		GameStart();
+		
 	}
 
-	#region ƒAƒ‰[ƒ€
-	async@UniTask GameStart()
+	#region ã‚¢ãƒ©ãƒ¼ãƒ 
+	public async UniTask GameStart()
 	{
 		await ClockCon.AlarmTimerStart();
 		ClockCon.AlarmStart();
@@ -22,9 +22,9 @@ public class GameManager : MonoBehaviour
 	}
 	#endregion
 
-	#region QTEŠÖ˜A
+	#region QTEé–¢é€£
 	/// <summary>
-	/// ƒAƒ‰[ƒ€‚ğ~‚ß‚é
+	/// ã‚¢ãƒ©ãƒ¼ãƒ ã‚’æ­¢ã‚ã‚‹
 	/// </summary>
 	public void AlarmStop()
 	{
@@ -35,8 +35,8 @@ public class GameManager : MonoBehaviour
 	{
 		ScoreManager.Combo = combo;
 		QTE_Manager.SetActive(false);
-		//ƒŠƒUƒ‹ƒg•\¦
-		Debug.Log("ƒŠƒUƒ‹ƒg•\¦");
+		//ãƒªã‚¶ãƒ«ãƒˆè¡¨ç¤º
+		Debug.Log("ãƒªã‚¶ãƒ«ãƒˆè¡¨ç¤º");
 		Debug.Log(ScoreManager.Score);
 	}
 	#endregion
