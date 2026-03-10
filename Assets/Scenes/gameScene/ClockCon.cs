@@ -23,15 +23,22 @@ public class ClockCon : MonoBehaviour
 	CancellationToken CTAlarmStop;
 
 	/// <summary>
+	/// アラームのタイマーを動かす
+	/// </summary>
+	/// <returns></returns>
+	public async UniTask AlarmTimerStart()
+	{
+		float alarmTime = Random.Range(1, 1 + MaxAlarmTime);
+		Debug.Log(alarmTime);
+		await UniTask.Delay(TimeSpan.FromSeconds(alarmTime));
+	}
+
+	/// <summary>
 	/// アラームを鳴らす
 	/// </summary>
 	/// <returns></returns>
 	public async UniTask AlarmStart()
 	{
-		float alarmTime = Random.Range(1, 1 + MaxAlarmTime);
-		Debug.Log(alarmTime);
-		await UniTask.Delay(TimeSpan.FromSeconds(alarmTime));
-
 		//アラームが鳴る
 		Debug.Log("Alarm Start");
 		Transform.position += Jump;
