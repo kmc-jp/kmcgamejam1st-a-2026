@@ -1,4 +1,4 @@
-using UnityEngine;
+ï»¿using UnityEngine;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -24,7 +24,7 @@ public class ClockCon : MonoBehaviour
 	CancellationToken CTAlarmStop;
 
 	/// <summary>
-	/// ƒAƒ‰[ƒ€‚Ìƒ^ƒCƒ}[‚ğ“®‚©‚·
+	/// ã‚¢ãƒ©ãƒ¼ãƒ ã®ã‚¿ã‚¤ãƒãƒ¼ã‚’å‹•ã‹ã™
 	/// </summary>
 	/// <returns></returns>
 	public async UniTask AlarmTimerStart()
@@ -35,12 +35,12 @@ public class ClockCon : MonoBehaviour
 	}
 
 	/// <summary>
-	/// ƒAƒ‰[ƒ€‚ğ–Â‚ç‚·
+	/// ã‚¢ãƒ©ãƒ¼ãƒ ã‚’é³´ã‚‰ã™
 	/// </summary>
 	/// <returns></returns>
 	public async UniTask AlarmStart()
 	{
-		//ƒAƒ‰[ƒ€‚ª–Â‚é
+		//ã‚¢ãƒ©ãƒ¼ãƒ ãŒé³´ã‚‹
 		Debug.Log("Alarm Start");
 		Transform.position += Jump;
 		alarming = true;
@@ -50,18 +50,20 @@ public class ClockCon : MonoBehaviour
 	}
 
 	/// <summary>
-	/// ƒAƒ‰[ƒ€‚ğ~‚ß‚é
+	/// ã‚¢ãƒ©ãƒ¼ãƒ ã‚’æ­¢ã‚ã‚‹
 	/// </summary>
-	/// <returns>~‚ß‚é‚Ü‚Å‚ÌŠÔ</returns>
+	/// <returns>æ­¢ã‚ã‚‹ã¾ã§ã®æ™‚é–“</returns>
 	public double AlarmStop()
 	{
 		alarming = false;
 		CTSAlarmStop.Cancel();
-		return Time.timeAsDouble - alarmStartTime;
+		double alarmTime = Time.timeAsDouble - alarmStartTime;
+		Debug.Log($"Alarm Stop  Time : {alarmTime}");
+		return alarmTime;
 	}
 
 	/// <summary>
-	/// U“®‚·‚é
+	/// æŒ¯å‹•ã™ã‚‹
 	/// </summary>
 	/// <param name="CTAlarmStop"></param>
 	/// <returns></returns>
@@ -80,7 +82,7 @@ public class ClockCon : MonoBehaviour
 				await UniTask.Delay(1);
 			}
 		}
-		catch(OperationCanceledException) { /*‰½‚à‚¹‚¸‚Éfinally*/}
+		catch(OperationCanceledException) { /*ä½•ã‚‚ã›ãšã«finally*/}
 		finally
 		{
 			if(vibe)
