@@ -8,6 +8,8 @@ public class GameManager : MonoBehaviour
 	[SerializeField] GameObject QTEManagerObj;
 	[SerializeField] QTEManager QTEManager;
 
+	UniTaskCompletionSource GameEndTaskSource;
+
 	private void Start()
 	{
 		
@@ -16,9 +18,13 @@ public class GameManager : MonoBehaviour
 	#region アラーム
 	public async UniTask GameStart()
 	{
+		GameEndTaskSource = new UniTaskCompletionSource();
 		await ClockCon.AlarmTimerStart();
 		ClockCon.AlarmStart();
 		QTEManagerObj.SetActive(true);
+
+		await GameEndTaskSource.Task;
+		GameEndTaskSource = null;
 	}
 	#endregion
 
@@ -35,6 +41,7 @@ public class GameManager : MonoBehaviour
 	{
 		ScoreManager.Combo = combo;
 		QTEManagerObj.SetActive(false);
+		GameEndTaskSource.TrySetResult();
 		//リザルト表示
 		Debug.Log("リザルト表示");
 		Debug.Log(ScoreManager.Score);
