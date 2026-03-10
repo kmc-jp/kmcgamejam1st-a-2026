@@ -1,0 +1,7 @@
+root = true
+
+# c#のファイルを指定
+[*.cs]
+
+# UTF-8に変換
+charset = utf-8-bom
