@@ -5,7 +5,7 @@ using UnityEngine;
 public class GameManager : MonoBehaviour
 {
 	[SerializeField] ClockCon ClockCon;
-	[SerializeField] GameObject QTE_Manager;
+	[SerializeField] GameObject QTEManagerObj;
 	[SerializeField] QTEManager QTEManager;
 
 	private void Start()
@@ -18,7 +18,7 @@ public class GameManager : MonoBehaviour
 	{
 		await ClockCon.AlarmTimerStart();
 		ClockCon.AlarmStart();
-		QTE_Manager.SetActive(true);
+		QTEManagerObj.SetActive(true);
 	}
 	#endregion
 
@@ -34,7 +34,7 @@ public class GameManager : MonoBehaviour
 	public void QTEEnded(int combo)
 	{
 		ScoreManager.Combo = combo;
-		QTE_Manager.SetActive(false);
+		QTEManagerObj.SetActive(false);
 		//リザルト表示
 		Debug.Log("リザルト表示");
 		Debug.Log(ScoreManager.Score);
