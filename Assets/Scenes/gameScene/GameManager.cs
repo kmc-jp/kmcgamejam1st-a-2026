@@ -1,5 +1,5 @@
-﻿using Assets.Scenes.gameScene;
-using Cysharp.Threading.Tasks;
+﻿using Cysharp.Threading.Tasks;
+using R3;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -13,6 +13,9 @@ public class GameManager : MonoBehaviour
 	[SerializeField] ClockCon ClockCon;
 	[SerializeField] GameObject QTEManagerObj;
 	[SerializeField] QTEManager QTEManager;
+	[SerializeField] GameObject ScoreIndicator;
+	private readonly ReactiveProperty<int> _score = new(0);
+	public ReadOnlyReactiveProperty<int> Score => _score;
 
 	UniTaskCompletionSource GameEndTaskSource;
 
@@ -26,6 +29,7 @@ public class GameManager : MonoBehaviour
 	{
 		QTEManager.Reset();
 		BtnStart.interactable = false;
+		ScoreIndicator.SetActive(false);
 		GameEndTaskSource = new UniTaskCompletionSource();
 		float waitTime = Random.Range(minWaitTime, maxWaitTime);
 		await UniTask.Delay((int)(waitTime * 1000));
@@ -38,24 +42,21 @@ public class GameManager : MonoBehaviour
 	#endregion
 
 	#region QTE関連
-	/// <summary>
-	/// アラームを止める
-	/// </summary>
-	// public void AlarmStop()
-	// {
-	// 	ScoreManager.AlarmTime = ClockCon.AlarmStop();
-	// }
-
 	public void QTEEnded(int combo)
 	{
-		ScoreManager.Combo = combo;
 		QTEManagerObj.SetActive(false);
 		GameEndTaskSource.TrySetResult();
 		ClockCon.TurnOff();
 		BtnStart.interactable = true;
 		//リザルト表示
 		Debug.Log("リザルト表示");
-		Debug.Log(ScoreManager.Score);
+		Debug.Log(_score.Value);
+		ScoreIndicator.SetActive(true);
 	}
 	#endregion
+	public void AddScore(int score)
+	{
+		_score.Value += score;
+		Debug.Log($"スコア加算: {score}, 現在のスコア: {_score.Value}");
+	}
 }
