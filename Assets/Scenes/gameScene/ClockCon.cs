@@ -1,110 +1,75 @@
 ﻿using UnityEngine;
-using System;
-using System.Collections;
-using System.Collections.Generic;
 using Cysharp.Threading.Tasks;
 using System.Threading;
-using System.Threading.Tasks;
-using Unity.VisualScripting;
-using NUnit.Framework;
-
-using Random = UnityEngine.Random;
+using R3;
 
 public class ClockCon : MonoBehaviour
 {
-	Vector3 startPos;
-    readonly Vector3 Jump = new(0, 0.5f);
-	readonly Vector3 vibration = new(0.1f, 0);
+	[Header("Settings")]
+	[SerializeField] private float jumpHeight = 0.5f;
+	[SerializeField] private float jumpSpeed = 10f;
+	[SerializeField] private AudioSource audioSource;
 
-	[SerializeField] float MaxAlarmTime;
+	private readonly ReactiveProperty<bool> _isAlarming = new(false);
+	private CancellationTokenSource _alarmCts;
 
-	bool alarming = false;
-	double alarmStartTime;
-	CancellationTokenSource CTSAlarmStop;
-	CancellationToken CTAlarmStop;
-
-	/// <summary>
-	/// リセット用のデータを設定
-	/// </summary>
 	private void Start()
 	{
-		startPos = base.transform.position;
+		_isAlarming
+			.Where(x => x == true)
+			.Subscribe(_ =>
+			{
+				ResetCts(); // 念の為
+				_alarmCts = new CancellationTokenSource();
+				PlayAlarmLoop(_alarmCts.Token).Forget();
+			})
+			.AddTo(this);
+
+		_isAlarming
+			.Where(x => x == false)
+			.Subscribe(_ => ResetCts())
+			.AddTo(this);
 	}
 
-	/// <summary>
-	/// アラームのタイマーを動かす
-	/// </summary>
-	/// <returns></returns>
-	public async UniTask AlarmTimerStart()
-	{
-		float alarmTime = Random.Range(1, 1 + MaxAlarmTime);
-		Debug.Log(alarmTime);
-		await UniTask.Delay(TimeSpan.FromSeconds(alarmTime));
-	}
+	// 外部公開用
+	public void TurnOn() => _isAlarming.Value = true;
+	public void TurnOff() => _isAlarming.Value = false;
 
-	/// <summary>
-	/// アラームを鳴らす
-	/// </summary>
-	/// <returns></returns>
-	public async UniTask AlarmStart()
+	private async UniTaskVoid PlayAlarmLoop(CancellationToken ct)
 	{
-		//アラームが鳴る
-		Debug.Log("Alarm Start");
-		transform.position += Jump;
-		alarming = true;
-		alarmStartTime = Time.time;
-		CTSAlarmStop = new CancellationTokenSource();
-		CTAlarmStop = CTSAlarmStop.Token;
-		await Alarming(CTAlarmStop);
-	}
-
-	/// <summary>
-	/// アラームを止める
-	/// </summary>
-	/// <returns>止めるまでの時間</returns>
-	public double AlarmStop()
-	{
-		alarming = false;
-		CTSAlarmStop.Cancel();
-		CTSAlarmStop = null;
-		double alarmTime = Time.timeAsDouble - alarmStartTime;
-		Debug.Log($"Alarm Stop  Time : {alarmTime}");
-		return alarmTime;
-	}
-
-	/// <summary>
-	/// 振動する
-	/// </summary>
-	/// <param name="CTAlarmStop"></param>
-	/// <returns></returns>
-	async UniTask Alarming(CancellationToken CTAlarmStop)
-	{
-		bool vibe = false;
+		Vector3 initialPosition = transform.position;
 		try
 		{
-			while(!CTAlarmStop.IsCancellationRequested)
+			while (!ct.IsCancellationRequested)
 			{
-				transform.position += vibration;
-				vibe = true;
-				await UniTask.Delay(1);
-				transform.position -= vibration;
-				vibe = true;
-				await UniTask.Delay(1);
+				// ジャンプの計算
+				float newY = initialPosition.y + Mathf.Abs(Mathf.Sin(Time.time * jumpSpeed)) * jumpHeight;
+				transform.position = new Vector3(initialPosition.x, newY, initialPosition.z);
+
+				// 音を鳴らす
+				if (!audioSource.isPlaying)
+				{
+					audioSource.Play();
+				}
+
+				await UniTask.Yield(PlayerLoopTiming.Update, ct);
 			}
 		}
-		catch(OperationCanceledException) { /*何もせずにfinally*/}
 		finally
 		{
-			if(vibe)
-			{
-				transform.position -= vibration;
-			}
-			Debug.Log("Alarm Stop");
+			transform.position = initialPosition; // 元の位置に戻す
+			audioSource.Stop(); // 音を止める
 		}
 	}
-
-	public void Reset()
+	private void ResetCts()
 	{
-		base.transform.position = startPos;
+		_alarmCts?.Cancel();
+		_alarmCts?.Dispose();
+		_alarmCts = null;
+	}
+	private void OnDestroy()
+	{
+		ResetCts();
+		_isAlarming.Dispose();
 	}
 }
