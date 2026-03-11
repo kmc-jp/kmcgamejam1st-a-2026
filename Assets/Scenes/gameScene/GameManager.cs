@@ -38,14 +38,6 @@ public class GameManager : MonoBehaviour
 	#endregion
 
 	#region QTE関連
-	/// <summary>
-	/// アラームを止める
-	/// </summary>
-	// public void AlarmStop()
-	// {
-	// 	ScoreManager.AlarmTime = ClockCon.AlarmStop();
-	// }
-
 	public void QTEEnded(int combo)
 	{
 		ScoreManager.Combo = combo;
