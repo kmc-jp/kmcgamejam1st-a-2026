@@ -45,8 +45,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 47ec56b6906745540af29d79269aedf4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::MusicManager
-  AudioSource: {fileID: 0}
-  Musics: []
+  AudioSource: {fileID: 8242282714572985638}
+  MusicConPrefab: {fileID: 4136471457156395660, guid: 91fe8d8923c6b074e80178b4186e1869, type: 3}
+  Musics:
+  - {fileID: 0}
 --- !u!82 &8242282714572985638
 AudioSource:
   m_ObjectHideFlags: 0
@@ -60,7 +62,7 @@ AudioSource:
   m_audioClip: {fileID: 0}
   m_Resource: {fileID: 0}
   m_PlayOnAwake: 1
-  m_Volume: 1
+  m_Volume: 0
   m_Pitch: 1
   Loop: 0
   Mute: 0

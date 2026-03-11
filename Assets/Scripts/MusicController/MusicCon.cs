@@ -11,18 +11,12 @@ using UnityEditor;
 
 public class MusicCon : MonoBehaviour
 {
-    [Header("Settings")]
-    [SerializeField] AudioClip Audio;
-    [SerializeField] bool IsBGM;
-    [Header("Tori-Aezu")]
-    [SerializeField, Range(0, 1)] float Volume;
+    AudioClip Audio;
+    bool IsBGM;
+    float Volume;
 
-    AudioSource AudioSource;
-
-    public MusicCon(AudioSource AudioSouce)
-    {
-        this.AudioSource = AudioSouce;
-    }
+    [HideInInspector] public AudioSource AudioSource;
+    [HideInInspector] public Action<MusicCon> OnInspectorAction;
 
 	private void Awake()
 	{
@@ -57,10 +51,11 @@ public class MusicCon : MonoBehaviour
             // target は処理コードのインスタンスだよ！ 処理コードの型でキャストして使ってね！
             MusicCon Con = target as MusicCon;
 
-            AudioClip audio = EditorGUILayout.ObjectField("Audio", null, typeof(AudioClip), true) as AudioClip;
             EditorGUILayout.BeginHorizontal();
+            AudioClip audio = EditorGUILayout.ObjectField("Audio", null, typeof(AudioClip), true) as AudioClip;
             bool BGM = EditorGUILayout.Toggle("IsBGM", false);
             float volume = (float)EditorGUILayout.IntSlider("volume", 100, 0, 100) / 100;
+            if(GUILayout.Button("削除")) Con.OnInspectorAction(Con);
             EditorGUILayout.EndHorizontal();
             Con.Audio = audio;
             Con.IsBGM = BGM;

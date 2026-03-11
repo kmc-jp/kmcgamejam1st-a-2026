@@ -6,8 +6,6 @@ using System.Collections.Generic;
 using UnityEngine.InputSystem;
 using System.Linq;
 
-
-
 #if UNITY_EDITOR
 using UnityEditor;
 #endif
@@ -17,7 +15,8 @@ using UnityEditor;
 public class MusicManager : MonoBehaviour
 {
 	[SerializeField] AudioSource AudioSource;
-    [SerializeField] List<MusicCon> Musics;
+	[SerializeField] GameObject MusicConPrefab;
+	[SerializeField] List<MusicCon> Musics;
 
 
 #if UNITY_EDITOR
@@ -25,43 +24,44 @@ public class MusicManager : MonoBehaviour
 	/// カスタムインスペクター
 	/// </summary>
 	[CustomEditor(typeof(MusicManager))]
-	public class MusicConEditor : Editor
+	public class MusicanagerEditor : Editor
 	{
-		bool folding = false;
-
 		public override void OnInspectorGUI()
 		{
-			MusicManager Mane = target as MusicManager;
-
-			AudioSource AS = EditorGUILayout.ObjectField("AudioSource", null, typeof(AudioSource), true) as AudioSource;
-			Mane.AudioSource = AS;
+			base.OnInspectorGUI();
+			MusicManager Manager = target as MusicManager;
 
 			// Musics
-			List<MusicCon> MusicList = Mane.Musics;
+			List<MusicCon> MusicList = Manager.Musics;
 			int i, len = MusicList.Count;
 
-			// 折りたたみ表示
-			if(folding = EditorGUILayout.Foldout(folding, "Musics"))
+			//削除するオブジェクトのリスト
+			List<MusicCon> deleteList = new();
+			// リスト表示
+			for(i = 0; i < len; ++i)
 			{
-				List<MusicCon> deleteList = new();
-				// リスト表示
-				for(i = 0; i < len; ++i)
-				{
-					EditorGUILayout.BeginHorizontal();
-					MusicList[i] = EditorGUILayout.ObjectField(MusicList[i], typeof(MusicCon), true) as MusicCon;
-					if(GUILayout.Button("削除"))
-					{
-						deleteList.Add(MusicList[i]);
-					}
-					EditorGUILayout.EndHorizontal();
-				}
+				EditorGUILayout.BeginHorizontal();
+				CreateEditor(MusicList[i])?.OnInspectorGUI();
+				//if(GUILayout.Button("削除"))
+				//{
+				//	deleteList.Add(MusicList[i]);
+				//}
+				EditorGUILayout.EndHorizontal();
+			}
 
-				foreach(var Removed in deleteList) MusicList.Remove(Removed);
+			//削除実行
+			foreach(var Removed in deleteList) MusicList.Remove(Removed);
 
-				if(GUILayout.Button("追加"))
-				{
-					MusicList.Add(new(AS));
-				}
+			if(GUILayout.Button("追加"))
+			{
+				Undo.RecordObject(Manager, "Add Item to List");//Ctrl+Zで戻せるように
+
+				MusicCon Con = GameObject.Instantiate(Manager.MusicConPrefab).GetComponent<MusicCon>();
+				//Debug.Log($"null : {Con is null}, fake null : {Con == null}");
+				Con.AudioSource = Manager.AudioSource;
+				Con.OnInspectorAction = c => deleteList.Add(c);
+				MusicList.Add(Con);
+				EditorUtility.SetDirty(Manager);
 			}
 
 		}
