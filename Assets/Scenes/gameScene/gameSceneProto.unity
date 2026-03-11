@@ -1245,7 +1245,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::ClockCon
   jumpHeight: 0.5
   jumpSpeed: 10
-  audioSource: {fileID: 0}
+  audioSource: {fileID: 1610682576}
 --- !u!82 &1610682576
 AudioSource:
   m_ObjectHideFlags: 0
