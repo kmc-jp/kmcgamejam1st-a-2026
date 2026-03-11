@@ -1,40 +1,61 @@
+ï»¿using Assets.Scenes.gameScene;
 using Cysharp.Threading.Tasks;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class GameManager : MonoBehaviour
 {
+	[Header("Settings")]
+	[SerializeField] float minWaitTime = 1f;
+	[SerializeField] float maxWaitTime = 3f;
+	[Header("References")]
+	[SerializeField] Button BtnStart;
 	[SerializeField] ClockCon ClockCon;
-	[SerializeField] GameObject QTE_Manager;
+	[SerializeField] GameObject QTEManagerObj;
 	[SerializeField] QTEManager QTEManager;
+
+	UniTaskCompletionSource GameEndTaskSource;
 
 	private void Start()
 	{
-		GameStart();
+		BtnStart.onClick.AddListener(() => GameStart().Forget());
 	}
 
-	#region ƒAƒ‰[ƒ€
-	async@UniTask GameStart()
+	#region ã‚¢ãƒ©ãƒ¼ãƒ 
+	public async UniTask GameStart()
 	{
-		await ClockCon.AlarmTimerStart();
-		ClockCon.AlarmStart();
-		QTE_Manager.SetActive(true);
+		QTEManager.Reset();
+		BtnStart.interactable = false;
+		GameEndTaskSource = new UniTaskCompletionSource();
+		float waitTime = Random.Range(minWaitTime, maxWaitTime);
+		await UniTask.Delay((int)(waitTime * 1000));
+		ClockCon.TurnOn();
+		QTEManagerObj.SetActive(true);
+
+		await GameEndTaskSource.Task;
+		GameEndTaskSource = null;
 	}
 	#endregion
 
-	#region QTEŠÖ˜A
+	#region QTEé–¢é€£
 	/// <summary>
-	/// ƒAƒ‰[ƒ€‚ğ~‚ß‚é
+	/// ã‚¢ãƒ©ãƒ¼ãƒ ã‚’æ­¢ã‚ã‚‹
 	/// </summary>
-	public void AlarmStop()
-	{
-		ClockCon.AlarmStop();
-	}
+	// public void AlarmStop()
+	// {
+	// 	ScoreManager.AlarmTime = ClockCon.AlarmStop();
+	// }
 
 	public void QTEEnded(int combo)
 	{
-		QTE_Manager.SetActive(false);
-		//ƒŠƒUƒ‹ƒg•\¦
-		Debug.Log("ƒŠƒUƒ‹ƒg•\¦");
+		ScoreManager.Combo = combo;
+		QTEManagerObj.SetActive(false);
+		GameEndTaskSource.TrySetResult();
+		ClockCon.TurnOff();
+		BtnStart.interactable = true;
+		//ãƒªã‚¶ãƒ«ãƒˆè¡¨ç¤º
+		Debug.Log("ãƒªã‚¶ãƒ«ãƒˆè¡¨ç¤º");
+		Debug.Log(ScoreManager.Score);
 	}
 	#endregion
 }

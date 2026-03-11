@@ -13,7 +13,6 @@ public class DirectionArrowCon : MonoBehaviour
 
 	private void Awake()
 	{
-		QTEActionTypeToArrowString.Add(QTEActionType.All, "");
 		QTEActionTypeToArrowString.Add(QTEActionType.Left, "Å©");
 		QTEActionTypeToArrowString.Add(QTEActionType.Right, "Å®");
 		QTEActionTypeToArrowString.Add(QTEActionType.Up, "Å™");

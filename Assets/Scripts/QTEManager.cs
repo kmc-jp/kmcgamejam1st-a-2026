@@ -1,4 +1,4 @@
-using UnityEngine;
+﻿using UnityEngine;
 using UnityEngine.InputSystem;
 using R3;
 enum QTEActionType
@@ -7,7 +7,6 @@ enum QTEActionType
     Down,
     Left,
     Right,
-    All
 }
 
 // ゲームの進行の流れ
@@ -45,18 +44,23 @@ class QTEManager: MonoBehaviour
     {
     }
 
-    void OnEnable()
+	public void Reset()
+	{
+        comboCount = 0;
+	}
+
+	void OnEnable()
     {
         upInputAction?.Enable();
         downInputAction?.Enable();
         leftInputAction?.Enable();
         rightInputAction?.Enable();
-		SetFirstQTEAction();
 		// 最初の入力アクションにコールバックを設定
 		upInputAction.performed += ctx => OnQTEInput(QTEActionType.Up);
 		downInputAction.performed += ctx => OnQTEInput(QTEActionType.Down);
 		leftInputAction.performed += ctx => OnQTEInput(QTEActionType.Left);
 		rightInputAction.performed += ctx => OnQTEInput(QTEActionType.Right);
+        SetNextQTEAction(); // 最初のQTEアクションを設定
 	}
 
 	void OnDisable()
@@ -86,12 +90,7 @@ class QTEManager: MonoBehaviour
 
     private void OnQTEInput(QTEActionType inputType)
     {
-        //初回限定
-        if(currentQTEAction == QTEActionType.All)
-        {
-            GameManager.AlarmStop();
-		}
-        if (qteTimeLimit > 0 && inputType == currentQTEAction || currentQTEAction == QTEActionType.All)
+        if (qteTimeLimit > 0 && inputType == currentQTEAction)
         {
             Debug.Log($"QTE入力に成功: {inputType}");
             comboCount++;
@@ -109,18 +108,5 @@ class QTEManager: MonoBehaviour
         Debug.Log($"次のQTEアクション: {currentQTEAction}, 時間制限: {qteTimeLimit}");
         onTimeLimitReset.OnNext(qteTimeLimit);
         onTimeLimitTick.OnNext(qteTimeLimit);
-    }
-
-    private void SetFirstQTEAction()
-    {
-        // 最初のQTEアクションを設定
-        currentQTEAction = QTEActionType.All;
-		DirectionArrow.SetDirection(currentQTEAction);
-		// 初回は時間無制限
-		qteTimeLimit = -1;
-		Debug.Log($"次のQTEアクション: {currentQTEAction}");
-        // UIに伝達
-        onTimeLimitReset.OnNext(-1);
-        onTimeLimitTick.OnNext(-1);
     }
 }

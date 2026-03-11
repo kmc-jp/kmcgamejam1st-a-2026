@@ -1,89 +1,75 @@
-using UnityEngine;
-using System;
-using System.Collections;
-using System.Collections.Generic;
+Ôªøusing UnityEngine;
 using Cysharp.Threading.Tasks;
 using System.Threading;
-using System.Threading.Tasks;
-using Unity.VisualScripting;
-using NUnit.Framework;
-
-using Random = UnityEngine.Random;
+using R3;
 
 public class ClockCon : MonoBehaviour
 {
-	[SerializeField] Transform Transform;
-    readonly Vector3 Jump = new(0, 0.5f);
-	readonly Vector3 vibration = new(0.1f, 0);
+	[Header("Settings")]
+	[SerializeField] private float jumpHeight = 0.5f;
+	[SerializeField] private float jumpSpeed = 10f;
+	[SerializeField] private AudioSource audioSource;
 
-	[SerializeField] float MaxAlarmTime;
+	private readonly ReactiveProperty<bool> _isAlarming = new(false);
+	private CancellationTokenSource _alarmCts;
 
-	bool alarming = false;
-	CancellationTokenSource CTSAlarmStop = new CancellationTokenSource();
-	CancellationToken CTAlarmStop;
-
-	/// <summary>
-	/// ÉAÉâÅ[ÉÄÇÃÉ^ÉCÉ}Å[ÇìÆÇ©Ç∑
-	/// </summary>
-	/// <returns></returns>
-	public async UniTask AlarmTimerStart()
+	private void Start()
 	{
-		float alarmTime = Random.Range(1, 1 + MaxAlarmTime);
-		Debug.Log(alarmTime);
-		await UniTask.Delay(TimeSpan.FromSeconds(alarmTime));
+		_isAlarming
+			.Where(x => x == true)
+			.Subscribe(_ =>
+			{
+				ResetCts(); // Âøµ„ÅÆÁÇ∫
+				_alarmCts = new CancellationTokenSource();
+				PlayAlarmLoop(_alarmCts.Token).Forget();
+			})
+			.AddTo(this);
+
+		_isAlarming
+			.Where(x => x == false)
+			.Subscribe(_ => ResetCts())
+			.AddTo(this);
 	}
 
-	/// <summary>
-	/// ÉAÉâÅ[ÉÄÇñ¬ÇÁÇ∑
-	/// </summary>
-	/// <returns></returns>
-	public async UniTask AlarmStart()
-	{
-		//ÉAÉâÅ[ÉÄÇ™ñ¬ÇÈ
-		Debug.Log("Alarm Start");
-		Transform.position += Jump;
-		CTAlarmStop = CTSAlarmStop.Token;
-		await Alarming(CTAlarmStop);
-	}
+	// Â§ñÈÉ®ÂÖ¨ÈñãÁî®
+	public void TurnOn() => _isAlarming.Value = true;
+	public void TurnOff() => _isAlarming.Value = false;
 
-	/// <summary>
-	/// ÉAÉâÅ[ÉÄÇé~ÇﬂÇÈ
-	/// </summary>
-	public void AlarmStop()
+	private async UniTaskVoid PlayAlarmLoop(CancellationToken ct)
 	{
-		CTSAlarmStop.Cancel();
-	}
-
-	/// <summary>
-	/// êUìÆÇ∑ÇÈ
-	/// </summary>
-	/// <param name="CTAlarmStop"></param>
-	/// <returns></returns>
-	async UniTask Alarming(CancellationToken CTAlarmStop)
-	{
-		bool vibe = false;
+		Vector3 initialPosition = transform.position;
 		try
 		{
-			while(!CTAlarmStop.IsCancellationRequested)
+			while (!ct.IsCancellationRequested)
 			{
-				Transform.position += vibration;
-				vibe = true;
-				await UniTask.Delay(1);
-				Transform.position -= vibration;
-				vibe = true;
-				await UniTask.Delay(1);
+				// „Ç∏„É£„É≥„Éó„ÅÆË®àÁÆó
+				float newY = initialPosition.y + Mathf.Abs(Mathf.Sin(Time.time * jumpSpeed)) * jumpHeight;
+				transform.position = new Vector3(initialPosition.x, newY, initialPosition.z);
+
+				// Èü≥„ÇíÈ≥¥„Çâ„Åô
+				if (!audioSource.isPlaying)
+				{
+					audioSource.Play();
+				}
+
+				await UniTask.Yield(PlayerLoopTiming.Update, ct);
 			}
 		}
-		catch(OperationCanceledException) { /*âΩÇ‡ÇπÇ∏Ç…finally*/}
 		finally
 		{
-			if(vibe)
-			{
-				Transform.position -= vibration;
-			}
-			Debug.Log("Alarm Stop");
+			transform.position = initialPosition; // ÂÖÉ„ÅÆ‰ΩçÁΩÆ„Å´Êàª„Åô
+			audioSource.Stop(); // Èü≥„ÇíÊ≠¢„ÇÅ„Çã
 		}
 	}
-
-	
+	private void ResetCts()
+	{
+		_alarmCts?.Cancel();
+		_alarmCts?.Dispose();
+		_alarmCts = null;
+	}
+	private void OnDestroy()
+	{
+		ResetCts();
+		_isAlarming.Dispose();
+	}
 }
