@@ -1,7 +1,9 @@
 ﻿using TMPro;
+using System;
 using UnityEngine;
 using UnityEngine.SocialPlatforms.Impl;
 using UnityEngine.UI;
+using R3;
 
 public class ScoreIndicatorCon : MonoBehaviour
 {
@@ -12,7 +14,7 @@ public class ScoreIndicatorCon : MonoBehaviour
 
     public void ShowScore()
 	{
-		 Manager.Score.Subscribe(score => scoreUI.text = $"score").AddTo(this);
+		 Manager.Score.Subscribe(score => TMP.text = $"score : {score}").AddTo(this);
 	}
 
 	public void Reset()
