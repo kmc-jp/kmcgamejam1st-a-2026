@@ -1,5 +1,5 @@
-﻿using Assets.Scenes.gameScene;
-using Cysharp.Threading.Tasks;
+﻿using Cysharp.Threading.Tasks;
+using R3;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -13,6 +13,8 @@ public class GameManager : MonoBehaviour
 	[SerializeField] ClockCon ClockCon;
 	[SerializeField] GameObject QTEManagerObj;
 	[SerializeField] QTEManager QTEManager;
+	private readonly ReactiveProperty<int> _score = new(0);
+	public ReadOnlyReactiveProperty<int> Score => _score;
 
 	UniTaskCompletionSource GameEndTaskSource;
 
@@ -38,24 +40,15 @@ public class GameManager : MonoBehaviour
 	#endregion
 
 	#region QTE関連
-	/// <summary>
-	/// アラームを止める
-	/// </summary>
-	// public void AlarmStop()
-	// {
-	// 	ScoreManager.AlarmTime = ClockCon.AlarmStop();
-	// }
-
 	public void QTEEnded(int combo)
 	{
-		ScoreManager.Combo = combo;
 		QTEManagerObj.SetActive(false);
 		GameEndTaskSource.TrySetResult();
 		ClockCon.TurnOff();
 		BtnStart.interactable = true;
 		//リザルト表示
 		Debug.Log("リザルト表示");
-		Debug.Log(ScoreManager.Score);
+		Debug.Log(_score.Value);
 	}
 	#endregion
 }
