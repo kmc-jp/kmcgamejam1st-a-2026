@@ -11,6 +11,7 @@ GameObject:
   - component: {fileID: 2168067912277978707}
   - component: {fileID: 7566836311892359889}
   - component: {fileID: 4706399409307496924}
+  - component: {fileID: 5303581412184085910}
   m_Layer: 5
   m_Name: ScoreIndicator
   m_TagString: Untagged
@@ -137,3 +138,17 @@ MonoBehaviour:
   m_hasFontAssetChanged: 0
   m_baseMaterial: {fileID: 0}
   m_maskOffset: {x: 0, y: 0, z: 0, w: 0}
+--- !u!114 &5303581412184085910
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 264939195691076637}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b382740c26d71764481b4c16cfce0af1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::ScoreIndicatorCon
+  TMP: {fileID: 4706399409307496924}
+  Manager: {fileID: 0}

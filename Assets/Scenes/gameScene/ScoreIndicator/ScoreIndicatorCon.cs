@@ -9,16 +9,8 @@ public class ScoreIndicatorCon : MonoBehaviour
 {
     [SerializeField] TextMeshProUGUI TMP;
 	[SerializeField] GameManager Manager;
-
-
-
-    public void ShowScore()
+    private void Awake()
 	{
 		 Manager.Score.Subscribe(score => TMP.text = $"score : {score}").AddTo(this);
-	}
-
-	public void Reset()
-	{
-		
 	}
 }
