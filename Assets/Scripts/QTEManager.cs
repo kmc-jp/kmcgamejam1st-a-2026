@@ -160,8 +160,9 @@ class QTEManager: MonoBehaviour
         qTEPrompt.UpdateSlotBackColor(progress);
         if (currentQTEAction.IsCompleted())
         {
-            comboCount++;
-            Debug.Log($"コンボ数: {comboCount}");
+            countOfQTEs++;
+            Debug.Log($"QTE成功！コンボ数: {comboCount + 1}");
+            GameManager.AddScore(100 + comboCount * 10); // スコア加算
             SetNextQTEAction();
         }
     }
