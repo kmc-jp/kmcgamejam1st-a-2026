@@ -29,6 +29,7 @@ public class MusicCon : IDisposable
         AudioSource = AS;
         AudioSource.resource = Audio;
         AudioSource.volume = Volume;
+        Volume = 1;
     }
 
     //音量調整
