@@ -21,32 +21,40 @@ public class MusicCon : IDisposable
     [SerializeField, Range(0, 1)] float Volume = 1;
 
     [HideInInspector] public GameObject AudioSourceProvider;
-    [HideInInspector] public AudioSource AudioSource;
+    [HideInInspector] public AudioSource Source;
     [SerializeField, HideInInspector] public bool Delete = false;
 
     public MusicCon(AudioSource AS)
     {
-        AudioSource = AS;
-        AudioSource.resource = Audio;
-        AudioSource.volume = Volume;
+        Source = AS;
+        Source.resource = Audio;
+        Source.volume = Volume;
         Volume = 1;
     }
 
     //音量調整
     public void Play(float Volume = 1)
     {
-        AudioSource.loop = IsBGM;
-        if(IsBGM)
+        try
         {
-            AudioSource.Play();
+			Source.loop = IsBGM;
+            if(IsBGM)
+            {
+                Source.Play();
+            }
+            else
+            {
+                Source.PlayOneShot(Audio, Volume * this.Volume);
+            }
         }
-        else
+        catch (Exception e)
         {
-            AudioSource.PlayOneShot(Audio, Volume * this.Volume);
+            Debug.Log(e);
+            throw;
         }
     }
 	public void Stop()
-        => AudioSource.Stop();
+        => Source.Stop();
 
 	static void NullAndFakeNullCheck(object obj)
         => Debug.Log($"Null : {obj is null}, Fake Null : {obj == null}");
