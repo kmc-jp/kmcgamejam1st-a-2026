@@ -143,29 +143,5 @@ public class MusicCon : IDisposable
             EditorGUI.EndProperty();
         }
     }
-
-    /// <summary>
-    /// カスタムインスペクター
-    /// </summary>
-    [CustomEditor(typeof(MusicCon))]
-    public class MusicConEditor : Editor
-    {
-        public override void OnInspectorGUI()
-        {
-            base.OnInspectorGUI();
-            // target は処理コードのインスタンスだよ！ 処理コードの型でキャストして使ってね！
-            //MusicCon Con = target as MusicCon;
-
-            //EditorGUILayout.BeginHorizontal();
-            //AudioClip audio = EditorGUILayout.ObjectField("Audio", null, typeof(AudioClip), true) as AudioClip;
-            //bool BGM = EditorGUILayout.Toggle("IsBGM", false);
-            //float volume = (float)EditorGUILayout.IntSlider("volume", 100, 0, 100) / 100;
-            //if(GUILayout.Button("削除")) Con.OnInspectorDelete(Con);
-            //EditorGUILayout.EndHorizontal();
-            //Con.Audio = audio;
-            //Con.IsBGM = BGM;
-            //Con.Volume = volume;
-        }
-    }
 #endif
 }
