@@ -14,7 +14,7 @@ public class GameManager : MonoBehaviour
 	}
 
 	#region アラーム
-	async　UniTask GameStart()
+	async UniTask GameStart()
 	{
 		await ClockCon.AlarmTimerStart();
 		ClockCon.AlarmStart();
