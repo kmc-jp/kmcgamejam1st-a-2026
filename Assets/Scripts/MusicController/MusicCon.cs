@@ -85,7 +85,7 @@ public class MusicCon : IDisposable
                 }
 			};
 #else
-            GameObject.Destroy(AudioSourceProvider);
+            if (AudioSourceProvider != null && !AudioSourceProvider.IsDestroyed()) GameObject.Destroy(AudioSourceProvider);
             AudioSourceProvider = null;
 #endif
         }
