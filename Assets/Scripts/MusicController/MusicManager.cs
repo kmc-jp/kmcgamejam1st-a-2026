@@ -59,6 +59,7 @@ public class MusicManager : MonoBehaviour
 				Undo.RecordObject(Manager, "Add Item to List");//Ctrl+Zで戻せるように
 
 				GameObject AudioSourceProvider = Instantiate(Manager.AudioSourceProvider);
+				AudioSourceProvider.transform.parent = Manager.transform;
 				AudioSource AS = AudioSourceProvider.GetComponent<AudioSource>();
 				//Debug.Log($"null : {Con is null}, fake null : {Con == null}");
 				MusicCon Con = new(AS);
