@@ -2,6 +2,7 @@
 using UnityEngine;
 using DG.Tweening;
 using Cysharp.Threading;
+using Cysharp.Threading.Tasks;
 
 public class ResultUIView : MonoBehaviour
 {
@@ -20,7 +21,7 @@ public class ResultUIView : MonoBehaviour
         
     }
 
-    public async void PlayResultUI(int score, int combo)
+    public async UniTask PlayResultUI(int score, int combo)
     {
         // テキスト一式を見えなくする
         scoreText.DOFade(0f, 0f);
@@ -38,7 +39,7 @@ public class ResultUIView : MonoBehaviour
 
         // 1. "Score"テキストをツイーン
         var scoreTextSequence = DOTween.Sequence()
-            .Append(scoreText.rectTransform.DOAnchorPosX(-120f, 1f))
+            .Append(scoreText.rectTransform.DOAnchorPosX(-240f, 1f))
             .Join(scoreText.DOFade(1f, 1f));
         await scoreTextSequence.AsyncWaitForCompletion();
 
@@ -50,7 +51,7 @@ public class ResultUIView : MonoBehaviour
 
         // 3. "Combo"テキストをツイーン
         var comboTextSequence = DOTween.Sequence()
-            .Append(comboText.rectTransform.DOAnchorPosX(-120f, 1f))
+            .Append(comboText.rectTransform.DOAnchorPosX(-240f, 1f))
             .Join(comboText.DOFade(1f, 1f));
         await comboTextSequence.AsyncWaitForCompletion();
 

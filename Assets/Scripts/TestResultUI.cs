@@ -11,8 +11,10 @@ public class TestResultUI : MonoBehaviour
 
     void Start()
     {
-        playButton.onClick.AddListener(() => {
-            resultUIView.PlayResultUI(int.Parse(scoreField.text), int.Parse(comboField.text));
+        playButton.onClick.AddListener(async () => {
+            playButton.interactable = false;
+            await resultUIView.PlayResultUI(int.Parse(scoreField.text), int.Parse(comboField.text));
+            playButton.interactable = true;
         }
         );
     }
