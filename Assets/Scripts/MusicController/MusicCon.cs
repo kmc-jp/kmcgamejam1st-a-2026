@@ -28,6 +28,7 @@ public class MusicCon : IDisposable
     {
         AudioSource = AS;
         AudioSource.resource = Audio;
+        AudioSource.volume = Volume;
     }
 
     //音量調整
@@ -43,10 +44,10 @@ public class MusicCon : IDisposable
             AudioSource.PlayOneShot(Audio, Volume * this.Volume);
         }
     }
-    public void Stop()
+	public void Stop()
         => AudioSource.Stop();
 
-    static void NullAndFakeNullCheck(object obj)
+	static void NullAndFakeNullCheck(object obj)
         => Debug.Log($"Null : {obj is null}, Fake Null : {obj == null}");
 
     public void Dispose()
