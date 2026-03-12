@@ -1,4 +1,4 @@
-using Cysharp.Threading.Tasks;
+ï»¿using Cysharp.Threading.Tasks;
 using UnityEngine;
 
 public class GameManager : MonoBehaviour
@@ -6,14 +6,15 @@ public class GameManager : MonoBehaviour
 	[SerializeField] ClockCon ClockCon;
 	[SerializeField] GameObject QTE_Manager;
 	[SerializeField] QTEManager QTEManager;
+	[SerializeField] MusicManager MusicManager;
 
 	private void Start()
 	{
 		GameStart();
 	}
 
-	#region ƒAƒ‰[ƒ€
-	async@UniTask GameStart()
+	#region ã‚¢ãƒ©ãƒ¼ãƒ 
+	asyncã€€UniTask GameStart()
 	{
 		await ClockCon.AlarmTimerStart();
 		ClockCon.AlarmStart();
@@ -21,9 +22,9 @@ public class GameManager : MonoBehaviour
 	}
 	#endregion
 
-	#region QTEŠÖ˜A
+	#region QTEé–¢é€£
 	/// <summary>
-	/// ƒAƒ‰[ƒ€‚ğ~‚ß‚é
+	/// ã‚¢ãƒ©ãƒ¼ãƒ ã‚’æ­¢ã‚ã‚‹
 	/// </summary>
 	public void AlarmStop()
 	{
@@ -33,8 +34,8 @@ public class GameManager : MonoBehaviour
 	public void QTEEnded(int combo)
 	{
 		QTE_Manager.SetActive(false);
-		//ƒŠƒUƒ‹ƒg•\¦
-		Debug.Log("ƒŠƒUƒ‹ƒg•\¦");
+		//ãƒªã‚¶ãƒ«ãƒˆè¡¨ç¤º
+		Debug.Log("ãƒªã‚¶ãƒ«ãƒˆè¡¨ç¤º");
 	}
 	#endregion
 }
