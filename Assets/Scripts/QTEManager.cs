@@ -71,6 +71,7 @@ class QTEManager: MonoBehaviour
     // UIなどに伝達するためのイベント　R3を使用
     [SerializeField] private QTEPrompt qTEPrompt;
     public Subject<float> onTimeLimitReset = new(); // 制限時間がリフレッシュされたとき
+    public Subject<int> onComboUpdated = new(); // コンボ数がアップデートされたとき
     public Subject<Unit> onQTECompleted = new(); // QTEが成功したとき
     public Subject<Unit> onQTEFailed = new(); // QTEが失敗したとき
 
@@ -153,6 +154,7 @@ class QTEManager: MonoBehaviour
         if (currentQTEAction.inputPatterns.Count == progress)
         {
             countOfQTEs++;
+            onComboUpdated.OnNext(comboCount + 1);
             comboCount++; // コンボ数を増やす
             Debug.Log($"QTE成功！コンボ数: {comboCount + 1}");
             GameManager.AddScore(100 + comboCount * 10); // スコア加算

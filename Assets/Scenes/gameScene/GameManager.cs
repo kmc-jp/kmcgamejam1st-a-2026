@@ -16,6 +16,8 @@ public class GameManager : MonoBehaviour
 	[SerializeField] GameObject ScoreIndicator;
 	private readonly ReactiveProperty<int> _score = new(0);
 	public ReadOnlyReactiveProperty<int> Score => _score;
+	private Subject<int> onScoreAdded = new();
+	public Observable<int> OnScoreAdded => onScoreAdded;
 
 	UniTaskCompletionSource GameEndTaskSource;
 
@@ -58,5 +60,6 @@ public class GameManager : MonoBehaviour
 	{
 		_score.Value += score;
 		Debug.Log($"スコア加算: {score}, 現在のスコア: {_score.Value}");
+		onScoreAdded.OnNext(score);
 	}
 }

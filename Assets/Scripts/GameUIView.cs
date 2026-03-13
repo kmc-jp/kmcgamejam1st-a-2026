@@ -12,12 +12,6 @@ public class GameUIView : MonoBehaviour
     [SerializeField] private GameManager gameManager;
     [SerializeField] private QTEManager qteManager;
     
-    public void ShowScoreAddition (int scoreAdd)
-    {
-        scorePlusText.text = $"+{scoreAdd:N0}";
-        scorePlusText.DOFade(1f, 0f);
-        scorePlusText.DOFade(0f, 0.3f).SetEase(Ease.InCubic);
-    }
 
     void Start()
     {
@@ -27,10 +21,21 @@ public class GameUIView : MonoBehaviour
             {
                 scoreValueText.text = $"{score:N0}";
             }).AddTo(this);
+            gameManager.OnScoreAdded.Subscribe(scoreAddition =>
+            {
+                ShowScoreAddition(scoreAddition);
+            }).AddTo(this);
         }
         if (qteManager)
         {
-
+            qteManager.onComboUpdated.Subscribe(incrementedCombo =>
+            {
+                OnComboUpdated(incrementedCombo);
+            });
+            qteManager.onQTEFailed.Subscribe(_ =>
+            {
+                OnComboUpdated(0);
+            });
         }
         scorePlusText.DOFade(0f, 0f);
     }
@@ -51,6 +56,14 @@ public class GameUIView : MonoBehaviour
     public void Test_AddScore(int score)
     {
         scoreValueText.text = $"{score:N0}";
+    }
+
+
+    public void ShowScoreAddition(int scoreAdd)
+    {
+        scorePlusText.text = $"+{scoreAdd:N0}";
+        scorePlusText.DOFade(1f, 0f);
+        scorePlusText.DOFade(0f, 0.3f).SetEase(Ease.InCubic);
     }
 
     void Update()
