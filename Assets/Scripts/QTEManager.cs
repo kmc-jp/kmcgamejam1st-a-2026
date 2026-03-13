@@ -35,7 +35,7 @@ public struct QTEAction
             bool requiresShift = Random.value < Mathf.Clamp(difficluty * 0.1f, 0f, 0.5f); // 難易度に応じてShiftキーが必要になる確率を設定
             inputPatterns.Add((inputType, requiresShift));
         }
-        timeLimit = defaultTimeLimit * inputLength * Mathf.Clamp(1f - difficluty * 0.05f, 0.2f, 1f); // 難易度に応じて時間制限を短くする
+        timeLimit = defaultTimeLimit * inputLength * Mathf.Clamp(1f - difficluty * 0.05f, 0.3f, 1f); // 難易度に応じて時間制限を短くする
     }
 }
 
