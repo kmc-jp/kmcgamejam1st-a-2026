@@ -103,12 +103,12 @@ TextureImporter:
       name: firstbed_0002_0
       rect:
         serializedVersion: 2
-        x: 55
+        x: 0
         y: 0
-        width: 706
-        height: 729
+        width: 1920
+        height: 1080
       alignment: 0
-      pivot: {x: 0, y: 0}
+      pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
@@ -125,7 +125,7 @@ TextureImporter:
     customData: 
     physicsShape: []
     bones: []
-    spriteID: 
+    spriteID: fae24747eb4e48d43a4ab241d3419eba
     internalID: 0
     vertices: []
     indices: 
