@@ -76,6 +76,7 @@ class QTEManager: MonoBehaviour
 	[SerializeField] GameManager GameManager;
     [SerializeField] AudioSource smallSuccessES; // シーケンス一個ごとのSE
     [SerializeField] AudioSource smallFailSE; // ミスしたときのSE
+    [SerializeField] AudioSource bigSuccessES; // シーケンス完成時のSE
 
 	public void Reset()
 	{
@@ -149,6 +150,7 @@ class QTEManager: MonoBehaviour
             countOfQTEs++;
             onComboUpdated.OnNext(comboCount + 1);
             comboCount++; // コンボ数を増やす
+            bigSuccessES?.Play(); // シーケンス完成のSEを再生
             Debug.Log($"QTE成功！コンボ数: {comboCount + 1}");
             GameManager.AddScore(100 + comboCount * 10); // スコア加算
             SetNextQTEAction();
