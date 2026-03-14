@@ -21,6 +21,6 @@ public class AnimationStateManager : MonoBehaviour
 			intoBedAnimObj.SetActive(State.CurrentValue == GameState.Final);
 			BattlingAnimObj.SetActive(State.CurrentValue == GameState.Playing);
 			BattlingBedAnimObj.SetActive(State.CurrentValue == GameState.Playing);
-		});
+		}).AddTo(this);
 	}
 }
