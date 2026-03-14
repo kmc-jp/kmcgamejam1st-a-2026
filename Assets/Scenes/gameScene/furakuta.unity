@@ -221,6 +221,7 @@ GameObject:
   - component: {fileID: 211485093}
   - component: {fileID: 211485092}
   - component: {fileID: 211485091}
+  - component: {fileID: 211485094}
   m_Layer: 0
   m_Name: "\u8B0E\u30B9\u30C6\u30C3\u30D7\u3042\u3089\u308C\u3061\u3083\u30931"
   m_TagString: Untagged
@@ -324,6 +325,19 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &211485094
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 211485090}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1d1e07cae656f5f4aa99135c5456001f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::QTEAnimation
+  qteManager: {fileID: 253949839}
 --- !u!1 &253949838 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 208462782420299083, guid: c68e42763cc294c4083d5a866b0190c2, type: 3}
