@@ -2069,6 +2069,14 @@ PrefabInstance:
       propertyPath: GameManager
       value: 
       objectReference: {fileID: 551883505}
+    - target: {fileID: 9210673611056344861, guid: c68e42763cc294c4083d5a866b0190c2, type: 3}
+      propertyPath: qTETimerView
+      value: 
+      objectReference: {fileID: 818642773}
+    - target: {fileID: 9210673611056344861, guid: c68e42763cc294c4083d5a866b0190c2, type: 3}
+      propertyPath: playerAnimator
+      value: 
+      objectReference: {fileID: 211485091}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []

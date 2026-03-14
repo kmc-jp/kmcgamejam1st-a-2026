@@ -29,8 +29,11 @@ public class ResultUIView : MonoBehaviour
             -1020f,
             scoreText.rectTransform.localPosition.y,
             scoreText.rectTransform.localPosition.z);
+
         scoreValueText.DOFade(0f, 0f);
+
         comboText.DOFade(0f, 0f);
+
         comboText.rectTransform.localPosition = new Vector3(
             -1020f,
             comboText.rectTransform.localPosition.y,
@@ -44,8 +47,8 @@ public class ResultUIView : MonoBehaviour
         await scoreTextSequence.AsyncWaitForCompletion();
 
         // 2. スコア表示
-        var scoreValueTextSequence = DOTween.Sequence().
-            Append(DOVirtual.Int(0, score, 2f, v => { scoreValueText.text = $"{v:N0}"; }))
+        var scoreValueTextSequence = DOTween.Sequence()
+            .Append(DOVirtual.Int(0, score, 2f, v => { scoreValueText.text = $"{v:N0}"; }))
             .Join(scoreValueText.DOFade(1f, 1f));
         await scoreValueTextSequence.AsyncWaitForCompletion();
 
@@ -56,8 +59,8 @@ public class ResultUIView : MonoBehaviour
         await comboTextSequence.AsyncWaitForCompletion();
 
         // 4. コンボ数表示
-        var comboValueTextSequence = DOTween.Sequence().
-            Append(DOVirtual.Int(0, combo, 2f, v => { comboValueText.text = $"{v:N0}"; }))
+        var comboValueTextSequence = DOTween.Sequence()
+            .Append(DOVirtual.Int(0, combo, 2f, v => { comboValueText.text = $"{v:N0}"; }))
             .Join(comboValueText.DOFade(1f, 1f));
         await comboValueTextSequence.AsyncWaitForCompletion();
     }

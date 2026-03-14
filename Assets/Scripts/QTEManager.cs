@@ -19,11 +19,13 @@ public struct QTEAction
     public List<(QTEInputType, bool)> inputPatterns; // 入力パターンのリスト
     public float timeLimit; // 制限時間
 
-    public QTEAction(int difficluty, float defaultTimeLimit)
+    public QTEAction(int difficulty, float defaultTimeLimit)
     {
+        Debug.Log($"難易度：{difficulty}");
         // 入力の長さは難易度に応じて増やす
         // Shiftキーが必要である確率は難易度に応じて増やす
-        int inputLength = 1 + (int) Mathf.Sqrt(difficluty * 2); // 難易度の平方根に応じて入力の長さを増やす
+        // int inputLength = 1 + (int) Mathf.Sqrt(difficulty * 2); // 難易度の平方根に応じて入力の長さを増やす
+        int inputLength = 3 + difficulty; // 難易度（0始まり）に3を足した数を入力数にする
         inputPatterns = new List<(QTEInputType, bool)>();
         // 完全なランダムだと同じ入力が連続して出る可能性があるため、前回の入力と同じものが出ないようにする
         QTEInputType? lastInput = null;
@@ -35,10 +37,15 @@ public struct QTEAction
                 inputType = (QTEInputType)Random.Range(0, 4);
             } while (inputType == lastInput);
             lastInput = inputType;
-            bool requiresShift = Random.value < Mathf.Clamp(difficluty * 0.1f, 0f, 0.5f); // 難易度に応じてShiftキーが必要になる確率を設定
+            bool requiresShift = Random.value < Mathf.Clamp(difficulty * 0.1f, 0f, 0.5f); // 難易度に応じてShiftキーが必要になる確率を設定
             inputPatterns.Add((inputType, requiresShift));
         }
-        timeLimit = defaultTimeLimit * inputLength * Mathf.Clamp(1f - difficluty * 0.05f, 0.3f, 1f); // 難易度に応じて時間制限を短くする
+        timeLimit = defaultTimeLimit * inputLength * Mathf.Clamp(1f - difficulty * 0.05f, 0.3f, 1f); // 難易度に応じて時間制限を短くする
+    }
+
+    public void SetTimeLimit(float timeLimit)
+    {
+        this.timeLimit = timeLimit;
     }
 }
 
@@ -84,6 +91,9 @@ class QTEManager: MonoBehaviour
     [SerializeField] private InputAction leftInputAction;
     [SerializeField] private InputAction rightInputAction;
     [SerializeField] private InputAction shiftInputAction;
+
+    private float[] initialTimeLimits = new float[6] {2f, 1.7f, 1.5f, 1.3f, 1.15f, 1f};
+    private float[] TimeDecrease = new float[6] {0.1f, 0.085f, 0.075f, 0.065f, 0.0575f, 0.5f};
 
     void OnEnable()
     {
@@ -227,8 +237,12 @@ class QTEManager: MonoBehaviour
     private void SetNextQTEAction()
     {
         progress = 0; // 進行状況をリセット
+        int difficulty = countOfQTEs / 10; // 難易度
+        int step = countOfQTEs % 10; // その難易度内の何番目か？
+        int indexOfTable = Mathf.Min(difficulty, initialTimeLimits.Length - 1); // 配列外を防止
         // ランダムに次のQTEアクションを設定
-        currentQTEAction = new QTEAction(countOfQTEs / 5, defaultQTETimeLimit);
+        currentQTEAction = new QTEAction(countOfQTEs / 10, defaultQTETimeLimit);
+        currentQTEAction.SetTimeLimit((initialTimeLimits[indexOfTable] - step * TimeDecrease[indexOfTable]) * (indexOfTable+3));
         // コンボ数に応じて時間制限を短くする
         qteTimeLimit = currentQTEAction.timeLimit;
         qTEPrompt.Setup(currentQTEAction);
