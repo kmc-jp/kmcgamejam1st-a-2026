@@ -78,10 +78,6 @@ class QTEManager: MonoBehaviour
     [SerializeField] AudioSource smallFailSE; // ミスしたときのSE
     [SerializeField] AudioSource bigSuccessES; // シーケンス完成時のSE
 
-    [SerializeField] GameObject outFromBedRootObj;
-    [SerializeField] GameObject intoBedRootObj;
-    [SerializeField] GameObject BattleAlarehanObj;
-
 	public void Reset()
 	{
         comboCount = 0;
