@@ -4,6 +4,7 @@ using R3;
 using System.Collections.Generic;
 using System.Threading;
 using Cysharp.Threading.Tasks;
+using Unity.Properties;
 
 public enum QTEInputType
 {
@@ -60,6 +61,7 @@ class QTEManager: MonoBehaviour
 
     // UIなどに伝達するためのイベント　R3を使用
     [SerializeField] private QTEPrompt qTEPrompt;
+    [SerializeField] private QTETimerView qTETimerView;
     public Subject<float> onTimeLimitReset = new(); // 制限時間がリフレッシュされたとき
     public Subject<int> onComboUpdated = new(); // コンボ数がアップデートされたとき
     public Subject<Unit> onQTECompleted = new(); // QTEが成功したとき
@@ -71,6 +73,7 @@ class QTEManager: MonoBehaviour
     [SerializeField] AudioSource bigSuccessES; // シーケンス完成時のSE
     // Animationへの参照
     [SerializeField] Animator playerAnimator;
+    private UniTaskCompletionSource animationWaitCompletionSource;
 
     private CancellationTokenSource qteCts;
     private bool isPaused = false; // アニメーション中などに時間を止めるためのフラグ
@@ -163,8 +166,20 @@ class QTEManager: MonoBehaviour
                 bigSuccessES?.Play(); // シーケンス完成のSEを再生
                 Debug.Log($"QTE成功！コンボ数: {comboCount }");
                 GameManager.AddScore(100 + comboCount * 10); // スコア加算
-                SetNextQTEAction();
                 onQTECompleted.OnNext(Unit.Default);
+
+                // コンボ数が一定の倍数になったらアニメーションを再生
+                if (comboCount % 5 == 0)
+                {
+                    qTEPrompt.gameObject.SetActive(false); // アニメーション中はQTEプロンプトを非表示にする
+                    qTETimerView.gameObject.SetActive(false); // タイマービューも非表示にする
+                    PlayAnimation();
+                    animationWaitCompletionSource = new UniTaskCompletionSource();
+                    await animationWaitCompletionSource.Task.AttachExternalCancellation(ct); // アニメーションの完了を待つ
+                    qTEPrompt.gameObject.SetActive(true); // アニメーションが終わったらQTEプロンプトを再表示する
+                    qTETimerView.gameObject.SetActive(true); // タイマービューも再表示する
+                    GameManager.AddScore(100 * comboCount); // コンボボーナスのスコア加算
+                }
             }
             else
             {
@@ -212,7 +227,6 @@ class QTEManager: MonoBehaviour
     private void SetNextQTEAction()
     {
         progress = 0; // 進行状況をリセット
-        countOfQTEs++;
         // ランダムに次のQTEアクションを設定
         currentQTEAction = new QTEAction(countOfQTEs / 5, defaultQTETimeLimit);
         // コンボ数に応じて時間制限を短くする
@@ -220,5 +234,35 @@ class QTEManager: MonoBehaviour
         qTEPrompt.Setup(currentQTEAction);
         Debug.Log($"次のQTEアクション: {string.Join(", ", System.Linq.Enumerable.Select(currentQTEAction.inputPatterns, p => $"{p.Item1}{(p.Item2 ? "+Shift" : "")}"))}, 制限時間: {qteTimeLimit:F2}秒");
         onTimeLimitReset.OnNext(qteTimeLimit);
+    }
+    private void PlayAnimation()
+    {
+        // とりあえず４つのアニメーションの中からランダムに再生する
+        int animIndex = Random.Range(0, 4);
+        if (animIndex == 0)
+        {
+            playerAnimator.SetTrigger("Bat");
+        }
+        else if (animIndex == 1)
+        {
+            playerAnimator.SetTrigger("Cyclone");
+        }
+        else if (animIndex == 2)
+        {
+            playerAnimator.SetTrigger("Kick");
+        }
+        else if (animIndex == 3)
+        {
+            playerAnimator.SetTrigger("Punch");
+        }
+    }
+    // アニメーションの完了を通知する関数（アニメーションイベントから呼び出される想定）
+    public void OnAnimationComplete()
+    {
+        if (animationWaitCompletionSource != null)
+        {
+            animationWaitCompletionSource.TrySetResult();
+            animationWaitCompletionSource = null;
+        }
     }
 }
