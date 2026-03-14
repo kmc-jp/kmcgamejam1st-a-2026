@@ -2,6 +2,8 @@
 using UnityEngine.InputSystem;
 using R3;
 using System.Collections.Generic;
+using System.Threading;
+using Cysharp.Threading.Tasks;
 
 public enum QTEInputType
 {
@@ -40,9 +42,9 @@ public struct QTEAction
 }
 
 // ゲームの進行の流れ
-// 1. 受け付けるべきQTE入力をランダムに、限度時間を回を重ねるごとに短く設定する
-// 2. プレイヤーが正しい入力をした場合、コンボカウントを増やし、次のQTEに進む
-// 3. 時間切れになった場合、ゲームオーバー
+// 1. ゲーム開始 -> アラームが鳴り始めたりプレイヤーが飛び起きるなどして一定時間が経過 -> QTE開始
+// 2. QTE開始 -> プレイヤーは表示された入力パターンを時間内に入力 -> 入力成功ならスコア加算、次のQTEへ。入力失敗ならコンボリセット、次のQTEへ
+// 3. コンボが一定の倍数になるごとに、アニメーションやカットインとともに大きなスコア加算が入る
 
 class QTEManager: MonoBehaviour
 {
@@ -51,16 +53,10 @@ class QTEManager: MonoBehaviour
     private int progress = 0; // 現在のQTEアクションの進行状況を管理する変数
     private int countOfQTEs = 0; // これまでに出現したQTEの数
     private int comboCount = 0;
-    private float qteTimeLimit = 0.5f; // QTEの時間制限（秒
+    private float qteTimeLimit = 1f; // QTEの時間制限（秒)
     public float TimeLeft => qteTimeLimit; // 外部から残り時間を参照できるようにするプロパティ
     private QTEAction currentQTEAction; // 現在のQTEアクション
 
-    // ゲームの最初の入力を検出するためのInputAction
-    [SerializeField] private InputAction upInputAction;
-    [SerializeField] private InputAction downInputAction;
-    [SerializeField] private InputAction leftInputAction;
-    [SerializeField] private InputAction rightInputAction;
-    [SerializeField] private InputAction shiftInputAction;
 
     // UIなどに伝達するためのイベント　R3を使用
     [SerializeField] private QTEPrompt qTEPrompt;
@@ -76,21 +72,24 @@ class QTEManager: MonoBehaviour
     // Animationへの参照
     [SerializeField] Animator playerAnimator;
 
-	public void Reset()
-	{
-        comboCount = 0;
-	}
+    private CancellationTokenSource qteCts;
+    private bool isPaused = false; // アニメーション中などに時間を止めるためのフラグ
 
-	void OnEnable()
+    [Header("Input Actions")]
+    [SerializeField] private InputAction upInputAction;
+    [SerializeField] private InputAction downInputAction;
+    [SerializeField] private InputAction leftInputAction;
+    [SerializeField] private InputAction rightInputAction;
+    [SerializeField] private InputAction shiftInputAction;
+
+    void OnEnable()
     {
-        countOfQTEs = 0;
-        comboCount = 0;
         upInputAction?.Enable();
         downInputAction?.Enable();
         leftInputAction?.Enable();
         rightInputAction?.Enable();
         shiftInputAction?.Enable();
-        SetNextQTEAction(); // 最初のQTEアクションを設定
+        RunQTEAsync(CancellationToken.None).Forget();
 	}
 
 	void OnDisable()
@@ -102,31 +101,88 @@ class QTEManager: MonoBehaviour
         shiftInputAction?.Disable();
     }
 
-    void Update()
+
+    // R3で入力をストリーム化しておく
+    private Observable<(QTEInputType type, bool siShift)> OnInputAsObservable()
     {
-        if (qteTimeLimit > 0)
+        return Observable.EveryUpdate()
+            .Where(_ => !isPaused) // ポーズ中は入力を受け付けない
+            .Select(_ => GetCurrentInput())
+            .Where(input => input.HasValue)
+            .Select(input => input.Value);
+    }
+
+    private (QTEInputType type, bool siShift)? GetCurrentInput()
+    {
+        bool shiftPressed = shiftInputAction?.IsPressed() ?? false;
+        if (upInputAction?.WasPressedThisFrame() == true) return (QTEInputType.Up, shiftPressed);
+        if (downInputAction?.WasPressedThisFrame() == true) return (QTEInputType.Down, shiftPressed);
+        if (leftInputAction?.WasPressedThisFrame() == true) return (QTEInputType.Left, shiftPressed);
+        if (rightInputAction?.WasPressedThisFrame() == true) return (QTEInputType.Right, shiftPressed);
+        return null; // 入力がない場合はnullを返す
+    }
+    public void StartQTEPhase()
+    {
+        qteCts?.Cancel();
+        qteCts = new CancellationTokenSource();
+        RunQTEAsync(qteCts.Token).Forget();
+    }
+    public void InterruptQTEPhase()
+    {
+        qteCts?.Cancel();
+    }
+    public void PauseQTE(bool pause) => isPaused = pause;
+    private async UniTask RunQTEAsync(CancellationToken ct)
+    {
+        // 入力ストリームの監視を開始
+        using var inputSubscription = OnInputAsObservable().Subscribe(input => OnPlayerInput(input));
+
+        // ゲームオーバーになるまでのループ
+        while (!ct.IsCancellationRequested)
         {
-            qteTimeLimit -= Time.deltaTime;
-            if (qteTimeLimit <= 0)
+            SetNextQTEAction(); // 次のQTEアクションを設定
+            // １つのQTEに対する待機ループ
+            while (qteTimeLimit > 0)
+            {
+                await UniTask.Yield(PlayerLoopTiming.Update, ct); // 毎フレーム待機して、キャンセルが要求されたらループを抜ける
+                if (!isPaused)
+                {
+                    qteTimeLimit -= Time.deltaTime; // 時間を減らす
+                }
+                if (progress >= currentQTEAction.inputPatterns.Count)
+                {
+                    break; // すでに全ての入力を成功させている場合はループを抜ける
+                }
+            }
+            if (progress >= currentQTEAction.inputPatterns.Count)
+            {
+                // QTE成功
+                countOfQTEs++;
+                onComboUpdated.OnNext(comboCount + 1);
+                comboCount++; // コンボ数を増やす
+                bigSuccessES?.Play(); // シーケンス完成のSEを再生
+                Debug.Log($"QTE成功！コンボ数: {comboCount }");
+                GameManager.AddScore(100 + comboCount * 10); // スコア加算
+                SetNextQTEAction();
+                onQTECompleted.OnNext(Unit.Default);
+            }
+            else
             {
                 // 時間切れの処理
-                Debug.Log("時間切れ！ゲームオーバー");
-                // ゲームオーバーのロジックをここに追加
-                Debug.Log($"最終コンボ数: {comboCount}");
+                Debug.Log("時間切れ！QTE失敗");
+                onQTEFailed.OnNext(Unit.Default);
                 GameManager.QTEEnded(comboCount);
+                return; // QTEフェーズを終了
             }
         }
-        // 入力の検出
-        bool shiftPressed = shiftInputAction?.IsPressed() ?? false;
-        QTEInputType? inputType = upInputAction?.WasPressedThisFrame() == true ? QTEInputType.Up :
-                                  downInputAction?.WasPressedThisFrame() == true ? QTEInputType.Down :
-                                  leftInputAction?.WasPressedThisFrame() == true ? QTEInputType.Left :
-                                  rightInputAction?.WasPressedThisFrame() == true ? QTEInputType.Right : (QTEInputType?)null;
-        if (inputType == null)        {
-            return; // 入力がない場合は何もしない
-        }
+    }
+    private void OnPlayerInput((QTEInputType type, bool shift) input)
+    {
+        if (currentQTEAction.inputPatterns.Count <= progress)
+            return; // すでに全ての入力を成功させている場合は何もしない
+        
         var expectedInput = currentQTEAction.inputPatterns[progress];
-        if (inputType != expectedInput.Item1 || shiftPressed != expectedInput.Item2)
+        if (input.type != expectedInput.Item1 || input.shift != expectedInput.Item2)
         {
             // 入力が正しくない場合の処理
             Debug.Log("入力ミス！");
@@ -143,17 +199,6 @@ class QTEManager: MonoBehaviour
         progress++; // 進行状況を更新
         smallSuccessES?.Play(); // SEを再生
         UpdatePrompt(); // プロンプトの表示を更新
-        if (currentQTEAction.inputPatterns.Count == progress)
-        {
-            countOfQTEs++;
-            onComboUpdated.OnNext(comboCount + 1);
-            comboCount++; // コンボ数を増やす
-            bigSuccessES?.Play(); // シーケンス完成のSEを再生
-            Debug.Log($"QTE成功！コンボ数: {comboCount + 1}");
-            GameManager.AddScore(100 + comboCount * 10); // スコア加算
-            SetNextQTEAction();
-            onQTECompleted.OnNext(Unit.Default);
-        }
     }
     private void UpdatePrompt()
     {

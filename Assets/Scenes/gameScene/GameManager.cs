@@ -42,7 +42,6 @@ public class GameManager : MonoBehaviour
 	#region アラーム
 	public async UniTask GameStart()
 	{
-		QTEManager.Reset();
 		BtnStart.interactable = false;
 		GameEndTaskSource = new UniTaskCompletionSource();
 		float waitTime = Random.Range(minWaitTime, maxWaitTime);
