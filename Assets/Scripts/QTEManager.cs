@@ -58,8 +58,6 @@ class QTEManager: MonoBehaviour
     private float qteTimeLimit = 0.5f; // QTEの時間制限（秒
     public float TimeLeft => qteTimeLimit; // 外部から残り時間を参照できるようにするプロパティ
     private QTEAction currentQTEAction; // 現在のQTEアクション
-    // Shift以外は同じ入力が連続していても押し直してほしい
-    private bool[] isPressed = new bool[4]; // Up, Down, Left, Rightの入力状態を管理する配列
 
     // ゲームの最初の入力を検出するためのInputAction
     [SerializeField] private InputAction upInputAction;
@@ -75,8 +73,10 @@ class QTEManager: MonoBehaviour
     public Subject<Unit> onQTECompleted = new(); // QTEが成功したとき
     public Subject<Unit> onQTEFailed = new(); // QTEが失敗したとき
 
-
 	[SerializeField] GameManager GameManager;
+    [SerializeField] AudioSource smallSuccessES; // シーケンス一個ごとのSE
+    [SerializeField] AudioSource smallFailSE; // ミスしたときのSE
+    [SerializeField] AudioSource bigSuccessES; // シーケンス完成時のSE
 
 	public void Reset()
 	{
@@ -132,9 +132,9 @@ class QTEManager: MonoBehaviour
         {
             // 入力が正しくない場合の処理
             Debug.Log("入力ミス！");
+            smallFailSE?.Play(); // ミスのSEを再生
             onQTEFailed.OnNext(Unit.Default);
             comboCount = 0; // コンボ数をリセット
-            ResetInputStates(); // 入力状態をリセット
             if (resetProgressOnMiss)
             {
                 progress = 0; // 進行状況をリセット
@@ -142,31 +142,19 @@ class QTEManager: MonoBehaviour
             }
             return;
         }
-        if (isPressed[(int)inputType])
-        {
-            // すでに押されている入力が再度押された場合は無視する
-            return;
-        }
-        isPressed[(int)inputType] = true; // 入力状態を更新
         progress++; // 進行状況を更新
-        ResetInputStates(); // 入力状態をリセットして、同じ入力が連続しても押し直してほしい
+        smallSuccessES?.Play(); // SEを再生
         UpdatePrompt(); // プロンプトの表示を更新
         if (currentQTEAction.inputPatterns.Count == progress)
         {
             countOfQTEs++;
             onComboUpdated.OnNext(comboCount + 1);
             comboCount++; // コンボ数を増やす
+            bigSuccessES?.Play(); // シーケンス完成のSEを再生
             Debug.Log($"QTE成功！コンボ数: {comboCount + 1}");
             GameManager.AddScore(100 + comboCount * 10); // スコア加算
             SetNextQTEAction();
             onQTECompleted.OnNext(Unit.Default);
-        }
-    }
-    private void ResetInputStates()
-    {
-        for (int i = 0; i < isPressed.Length; i++)
-        {
-            isPressed[i] = false;
         }
     }
     private void UpdatePrompt()
@@ -180,8 +168,6 @@ class QTEManager: MonoBehaviour
     }
     private void SetNextQTEAction()
     {
-        // キーが押されている除隊をリセット
-        ResetInputStates();
         progress = 0; // 進行状況をリセット
         countOfQTEs++;
         // ランダムに次のQTEアクションを設定
