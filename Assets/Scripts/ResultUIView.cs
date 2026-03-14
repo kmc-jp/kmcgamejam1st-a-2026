@@ -39,7 +39,7 @@ public class ResultUIView : MonoBehaviour
 
         // 1. "Score"テキストをツイーン
         var scoreTextSequence = DOTween.Sequence()
-            .Append(scoreText.rectTransform.DOAnchorPosX(-240f, 1f))
+            .Append(scoreText.rectTransform.DOAnchorPosX(-120f, 1f))
             .Join(scoreText.DOFade(1f, 1f));
         await scoreTextSequence.AsyncWaitForCompletion();
 
@@ -51,7 +51,7 @@ public class ResultUIView : MonoBehaviour
 
         // 3. "Combo"テキストをツイーン
         var comboTextSequence = DOTween.Sequence()
-            .Append(comboText.rectTransform.DOAnchorPosX(-240f, 1f))
+            .Append(comboText.rectTransform.DOAnchorPosX(-120f, 1f))
             .Join(comboText.DOFade(1f, 1f));
         await comboTextSequence.AsyncWaitForCompletion();
 
