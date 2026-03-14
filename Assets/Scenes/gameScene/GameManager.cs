@@ -3,6 +3,16 @@ using R3;
 using UnityEngine;
 using UnityEngine.UI;
 
+public enum GameState
+{
+	InBed,
+	AlarmStoped,
+	Playing,
+	Final,
+}
+
+
+
 public class GameManager : MonoBehaviour
 {
 	[Header("Settings")]
@@ -20,6 +30,9 @@ public class GameManager : MonoBehaviour
 	public Observable<int> OnScoreAdded => onScoreAdded;
 
 	UniTaskCompletionSource GameEndTaskSource;
+
+	private readonly ReactiveProperty<GameState> _State;
+	public ReadOnlyReactiveProperty<GameState> State => _State;
 
 	private void Start()
 	{
