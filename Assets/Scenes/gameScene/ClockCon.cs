@@ -12,6 +12,7 @@ public class ClockCon : MonoBehaviour
 
 	private readonly ReactiveProperty<bool> _isAlarming = new(false);
 	private CancellationTokenSource _alarmCts;
+	private Animator _animator;
 
 	private void Start()
 	{
@@ -29,6 +30,7 @@ public class ClockCon : MonoBehaviour
 			.Where(x => x == false)
 			.Subscribe(_ => ResetCts())
 			.AddTo(this);
+		_animator = GetComponent<Animator>();
 	}
 
 	// 外部公開用
@@ -71,5 +73,12 @@ public class ClockCon : MonoBehaviour
 	{
 		ResetCts();
 		_isAlarming.Dispose();
+	}
+
+	public void IncrementShakeCount()
+	{
+		int shakeCount = _animator.GetInteger("shake_cnt");
+		shakeCount++;
+		_animator.SetInteger("shake_cnt", shakeCount);
 	}
 }
