@@ -43,6 +43,7 @@ public class GameManager : MonoBehaviour
 	public async UniTask GameStart()
 	{
 		QTEManager.Reset();
+		AnimationStateManager.Reset();
 		BtnStart.interactable = false;
 		ScoreIndicator.SetActive(false);
 		GameEndTaskSource = new UniTaskCompletionSource();
