@@ -1312,6 +1312,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::QTETimerView
   secondText: {fileID: 818642770}
   milliSecondText: {fileID: 818642769}
+  qteCountText: {fileID: 0}
   timerRingSprite: {fileID: 818642771}
   qteManager: {fileID: 253949839}
 --- !u!1 &928943468 stripped
@@ -1721,7 +1722,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!95 &1715779431
 Animator:
   serializedVersion: 7
@@ -2132,6 +2133,10 @@ PrefabInstance:
       propertyPath: GameManager
       value: 
       objectReference: {fileID: 551883505}
+    - target: {fileID: 3026906556185997965, guid: 6b5e70348de32f64da2f93e04f6f78c8, type: 3}
+      propertyPath: intoBedAnimCon
+      value: 
+      objectReference: {fileID: 1715779431}
     - target: {fileID: 3026906556185997965, guid: 6b5e70348de32f64da2f93e04f6f78c8, type: 3}
       propertyPath: intoBedAnimObj
       value: 

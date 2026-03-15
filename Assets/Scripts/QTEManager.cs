@@ -199,8 +199,9 @@ class QTEManager: MonoBehaviour
                 // 時間切れの処理
                 Debug.Log("時間切れ！QTE失敗");
                 onQTEFailed.OnNext(Unit.Default);
-                GameManager.QTEEnded(comboCount);
-                return; // QTEフェーズを終了
+                GameManager.QTEEnded(comboCount).Forget();
+
+				return; // QTEフェーズを終了
             }
         }
     }

@@ -1,4 +1,7 @@
-﻿using R3;
+﻿using Cysharp.Threading.Tasks;
+using R3;
+using R3.Triggers;
+using System.Linq;
 using UnityEngine;
 
 public class AnimationStateManager : MonoBehaviour
@@ -11,6 +14,12 @@ public class AnimationStateManager : MonoBehaviour
 	[SerializeField] GameObject BattlingAnimObj;
 	[Header("Animator")]
 	[SerializeField] Animator outFromBedAnimCon;
+	[SerializeField] Animator intoBedAnimCon;
+
+	UniTaskCompletionSource ArareAwakeTaskSource;
+	UniTaskCompletionSource ArareSleepTaskSource;
+
+
 
 	const string StopClock = nameof(StopClock);
 	const string Out = nameof(Out);
@@ -36,5 +45,39 @@ public class AnimationStateManager : MonoBehaviour
 			intoBedAnimObj.SetActive(State.CurrentValue == GameState.Final);
 			BattlingAnimObj.SetActive(State.CurrentValue == GameState.Playing);
 		}).AddTo(this);
+
+		outFromBedAnimCon
+			.GetBehaviours<ObservableStateMachineTrigger>()
+			.First()
+			.OnStateEnterAsObservable()
+			.Subscribe(_ =>
+			{
+				ArareAwakeTaskSource.TrySetResult();
+			})
+			.AddTo(this);
+
+		intoBedAnimCon
+			.GetBehaviours<ObservableStateMachineTrigger>()
+			.First()
+			.OnStateEnterAsObservable()
+			.Subscribe(_ =>
+			{
+				ArareSleepTaskSource.TrySetResult();
+			})
+			.AddTo(this);
+
+		ArareAwakeTaskReset();
+	}
+
+	public UniTask OutFromBedAnimTask
+		=> ArareAwakeTaskSource.Task;
+
+	public UniTask IntoBedAnimTask
+		=> ArareSleepTaskSource.Task;
+
+	public void ArareAwakeTaskReset()
+	{
+		ArareAwakeTaskSource = new();
+		ArareSleepTaskSource = new();
 	}
 }
