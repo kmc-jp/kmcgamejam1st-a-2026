@@ -2,6 +2,7 @@
 using R3;
 using R3.Triggers;
 using System.Linq;
+using System.Threading.Tasks;
 using UnityEngine;
 
 public class AnimationStateManager : MonoBehaviour
@@ -31,40 +32,73 @@ public class AnimationStateManager : MonoBehaviour
 		//アニメーションオブジェクトのアクティベーション
 		State.Subscribe(_ =>
 		{
+			outFromBedAnimObj.SetActive(State.CurrentValue <= GameState.Playing);//プレイ中
+			intoBedAnimObj.SetActive(State.CurrentValue == GameState.Final);
+			BattlingAnimObj.SetActive(State.CurrentValue == GameState.Playing);
 			switch (State.CurrentValue)
 			{
 				case GameState.AlarmStoped:
 					outFromBedAnimCon.SetTrigger(StopClock);
+					outFromBedAnimCon
+						.GetBehaviours<ObservableStateMachineTrigger>()
+						.First()
+						.OnStateEnterAsObservable()
+						.Subscribe(_ =>
+						{
+							Debug.Log("outFromBedAnimCon.GetBehaviours<ObservableStateMachineTrigger>()");
+							ArareAwakeTaskSource.TrySetResult();
+						})
+						.AddTo(this);
+
 					break;
 				case GameState.Playing:
 					outFromBedAnimCon.SetTrigger(Out);
 					break;
+				case GameState.Final:
+					intoBedAnimCon
+						.GetBehaviours<ObservableStateMachineTrigger>()
+						.First()
+						.OnStateEnterAsObservable()
+						.Subscribe(_ =>
+						{
+							Debug.Log("intoBedAnimCon.GetBehaviours<ObservableStateMachineTrigger>()");
+							ArareSleepTaskSource.TrySetResult();
+						})
+						.AddTo(this);
+					break;
 				default: break;
 			}
-			outFromBedAnimObj.SetActive(State.CurrentValue <= GameState.Playing);//プレイ中
-			intoBedAnimObj.SetActive(State.CurrentValue == GameState.Final);
-			BattlingAnimObj.SetActive(State.CurrentValue == GameState.Playing);
 		}).AddTo(this);
 
-		outFromBedAnimCon
-			.GetBehaviours<ObservableStateMachineTrigger>()
-			.First()
-			.OnStateEnterAsObservable()
-			.Subscribe(_ =>
-			{
-				ArareAwakeTaskSource.TrySetResult();
-			})
-			.AddTo(this);
+		outFromBedAnimObj.SetActive(true);
+		intoBedAnimObj.SetActive(true);
+		BattlingAnimObj.SetActive(true);
 
-		intoBedAnimCon
-			.GetBehaviours<ObservableStateMachineTrigger>()
-			.First()
-			.OnStateEnterAsObservable()
-			.Subscribe(_ =>
-			{
-				ArareSleepTaskSource.TrySetResult();
-			})
-			.AddTo(this);
+		//outFromBedAnimCon
+		//	.GetBehaviours<ObservableStateMachineTrigger>()
+		//	.First()
+		//	.OnStateEnterAsObservable()
+		//	.Subscribe(_ =>
+		//	{
+		//		Debug.Log("outFromBedAnimCon.GetBehaviours<ObservableStateMachineTrigger>()");
+		//		ArareAwakeTaskSource.TrySetResult();
+		//	})
+		//	.AddTo(this);
+
+		//intoBedAnimCon
+		//	.GetBehaviours<ObservableStateMachineTrigger>()
+		//	.First()
+		//	.OnStateEnterAsObservable()
+		//	.Subscribe(_ =>
+		//	{
+		//		Debug.Log("intoBedAnimCon.GetBehaviours<ObservableStateMachineTrigger>()");
+		//		ArareSleepTaskSource.TrySetResult();
+		//	})
+		//	.AddTo(this);
+
+		outFromBedAnimObj.SetActive(false);
+		intoBedAnimObj.SetActive(false);
+		BattlingAnimObj.SetActive(false);
 
 		ArareAwakeTaskReset();
 	}
