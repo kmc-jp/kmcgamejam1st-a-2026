@@ -14,8 +14,10 @@ public class AnimationStateManager : MonoBehaviour
 	[SerializeField] GameObject BattlingAnimObj;
 	[Header("Animator")]
 	[SerializeField] Animator outFromBedAnimCon;
+	[SerializeField] Animator intoBedAnimCon;
 
-	UniTaskCompletionSource ArareAwakeTask;
+	UniTaskCompletionSource ArareAwakeTaskSource;
+	UniTaskCompletionSource ArareSleepTaskSource;
 
 
 
@@ -50,16 +52,32 @@ public class AnimationStateManager : MonoBehaviour
 			.OnStateEnterAsObservable()
 			.Subscribe(_ =>
 			{
-				ArareAwakeTask.TrySetResult();
+				ArareAwakeTaskSource.TrySetResult();
+			})
+			.AddTo(this);
+
+		intoBedAnimCon
+			.GetBehaviours<ObservableStateMachineTrigger>()
+			.First()
+			.OnStateEnterAsObservable()
+			.Subscribe(_ =>
+			{
+				ArareSleepTaskSource.TrySetResult();
 			})
 			.AddTo(this);
 
 		ArareAwakeTaskReset();
 	}
 
-	public async UniTask waitOutFromBedAnim()
-		=> await ArareAwakeTask.Task;
+	public UniTask OutFromBedAnimTask
+		=> ArareAwakeTaskSource.Task;
+
+	public UniTask IntoBedAnimTask
+		=> ArareSleepTaskSource.Task;
 
 	public void ArareAwakeTaskReset()
-		=> ArareAwakeTask = new();
+	{
+		ArareAwakeTaskSource = new();
+		ArareSleepTaskSource = new();
+	}
 }
