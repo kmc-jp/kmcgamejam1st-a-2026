@@ -41,7 +41,7 @@ public class AnimationStateManager : MonoBehaviour
 					break;
 				default: break;
 			}
-			outFromBedAnimObj.SetActive((int)State.CurrentValue <= 3);//プレイ中
+			outFromBedAnimObj.SetActive(State.CurrentValue <= GameState.Playing);//プレイ中
 			intoBedAnimObj.SetActive(State.CurrentValue == GameState.Final);
 			BattlingAnimObj.SetActive(State.CurrentValue == GameState.Playing);
 		}).AddTo(this);
