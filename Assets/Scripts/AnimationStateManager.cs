@@ -70,20 +70,20 @@ public class AnimationStateManager : MonoBehaviour
 			}
 		}).AddTo(this);
 
-		outFromBedAnimObj.SetActive(true);
-		intoBedAnimObj.SetActive(true);
-		BattlingAnimObj.SetActive(true);
+		//outFromBedAnimObj.SetActive(true);
+		//intoBedAnimObj.SetActive(true);
+		//BattlingAnimObj.SetActive(true);
 
-		//outFromBedAnimCon
-		//	.GetBehaviours<ObservableStateMachineTrigger>()
-		//	.First()
-		//	.OnStateEnterAsObservable()
-		//	.Subscribe(_ =>
-		//	{
-		//		Debug.Log("outFromBedAnimCon.GetBehaviours<ObservableStateMachineTrigger>()");
-		//		ArareAwakeTaskSource.TrySetResult();
-		//	})
-		//	.AddTo(this);
+		////outFromBedAnimCon
+		////	.GetBehaviours<ObservableStateMachineTrigger>()
+		////	.First()
+		////	.OnStateEnterAsObservable()
+		////	.Subscribe(_ =>
+		////	{
+		////		Debug.Log("outFromBedAnimCon.GetBehaviours<ObservableStateMachineTrigger>()");
+		////		ArareAwakeTaskSource.TrySetResult();
+		////	})
+		////	.AddTo(this);
 
 		//intoBedAnimCon
 		//	.GetBehaviours<ObservableStateMachineTrigger>()
@@ -96,9 +96,9 @@ public class AnimationStateManager : MonoBehaviour
 		//	})
 		//	.AddTo(this);
 
-		outFromBedAnimObj.SetActive(false);
-		intoBedAnimObj.SetActive(false);
-		BattlingAnimObj.SetActive(false);
+		//outFromBedAnimObj.SetActive(false);
+		//intoBedAnimObj.SetActive(false);
+		//BattlingAnimObj.SetActive(false);
 
 		ArareAwakeTaskReset();
 	}
