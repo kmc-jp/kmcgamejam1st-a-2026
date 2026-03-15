@@ -49,6 +49,13 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::InputManager
   resetProgressOnMiss: 1
   defaultQTETimeLimit: 2.5
+  qTEPrompt: {fileID: 0}
+  qTETimerView: {fileID: 0}
+  GameManager: {fileID: 0}
+  smallSuccessES: {fileID: 3661968503044566127}
+  smallFailSE: {fileID: 8315001973435061609}
+  bigSuccessES: {fileID: 7412933550282370100}
+  playerAnimator: {fileID: 0}
   upInputAction:
     m_Name: Up Input
     m_Type: 0
@@ -134,11 +141,6 @@ MonoBehaviour:
       m_Action: Shift Input
       m_Flags: 0
     m_Flags: 0
-  qTEPrompt: {fileID: 0}
-  GameManager: {fileID: 0}
-  smallSuccessES: {fileID: 3661968503044566127}
-  smallFailSE: {fileID: 8315001973435061609}
-  bigSuccessES: {fileID: 7412933550282370100}
 --- !u!1 &6592871079417386775
 GameObject:
   m_ObjectHideFlags: 0
@@ -311,10 +313,10 @@ AudioSource:
   serializedVersion: 4
   OutputAudioMixerGroup: {fileID: 0}
   m_audioClip: {fileID: 0}
-  m_Resource: {fileID: 8300000, guid: f561bdab1d9b4074cb9e9e5d0ad36992, type: 3}
+  m_Resource: {fileID: 8300000, guid: e12b7c088953e4442b46222c0211cde1, type: 3}
   m_PlayOnAwake: 0
   m_Volume: 0.868
-  m_Pitch: 0.53
+  m_Pitch: 1
   Loop: 0
   Mute: 0
   Spatialize: 0

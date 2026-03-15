@@ -5,10 +5,10 @@ using UnityEngine.UI;
 
 public enum GameState
 {
-	InBed,
-	AlarmStoped,
-	Playing,
-	Final,
+	InBed = 0,
+	AlarmStoped = 1,
+	Playing = 2,
+	Final = 3,
 }
 
 
@@ -23,6 +23,7 @@ public class GameManager : MonoBehaviour
 	[SerializeField] ClockCon ClockCon;
 	[SerializeField] GameObject QTEManagerObj;
 	[SerializeField] QTEManager QTEManager;
+	[SerializeField] AnimationStateManager AnimationStateManager;
 	private readonly ReactiveProperty<int> _score = new(0);
 	public ReadOnlyReactiveProperty<int> Score => _score;
 	private Subject<int> onScoreAdded = new();
@@ -30,7 +31,7 @@ public class GameManager : MonoBehaviour
 
 	UniTaskCompletionSource GameEndTaskSource;
 
-	private readonly ReactiveProperty<GameState> _State;
+	private readonly ReactiveProperty<GameState> _State = new();
 	public ReadOnlyReactiveProperty<GameState> State => _State;
 
 	private void Start()
@@ -42,7 +43,9 @@ public class GameManager : MonoBehaviour
 	#region アラーム
 	public async UniTask GameStart()
 	{
+
 		BtnStart.interactable = false;
+		_State.Value = GameState.InBed;
 		GameEndTaskSource = new UniTaskCompletionSource();
 		float waitTime = Random.Range(minWaitTime, maxWaitTime);
 		await UniTask.Delay((int)(waitTime * 1000));
