@@ -30,7 +30,7 @@ public class GameManager : MonoBehaviour
 	private Subject<int> onScoreAdded = new();
 	public Observable<int> OnScoreAdded => onScoreAdded;
 
-	UniTaskCompletionSource GameEndTaskSource;
+    UniTaskCompletionSource GameEndTaskSource;
 
 	private readonly ReactiveProperty<GameState> _State = new();
 	public ReadOnlyReactiveProperty<GameState> State => _State;

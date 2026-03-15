@@ -45,6 +45,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ced478088605ca546b4611e1a085b96d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::BGMManager
+  BGM: {fileID: 8300000, guid: 2023f25bcd236c142b6a9d3277233ef8, type: 3}
+  ResultBGM: {fileID: 8300000, guid: 4e0cd29dd960864488527ae557e42e2d, type: 3}
+  QTEManager: {fileID: 0}
 --- !u!82 &8045675829351452731
 AudioSource:
   m_ObjectHideFlags: 0
