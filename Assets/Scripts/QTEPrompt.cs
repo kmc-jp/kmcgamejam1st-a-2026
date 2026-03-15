@@ -1,4 +1,4 @@
-using UnityEngine;
+﻿using UnityEngine;
 using UnityEngine.UI;
 using System.Collections.Generic;
 
@@ -8,17 +8,20 @@ public class QTEPrompt: MonoBehaviour
     [SerializeField] private GameObject arrowPrefab;
     [SerializeField] private List<Sprite> arrowSprites; // 上、下、左、右の順で矢印のスプライトを格納
     private List<GameObject> _spawnedSlots = new ();
+    private List<GameObject> _arrows = new ();
 
     public void Setup(QTEAction qteAction)
     {
         foreach (var s in _spawnedSlots) Destroy(s);
         _spawnedSlots.Clear();
+        _arrows.Clear();
 
         foreach (var pattern in qteAction.inputPatterns)
         {
             var slot = Instantiate(slotPrefab, transform);
             _spawnedSlots.Add(slot);
             var arrow = Instantiate(arrowPrefab, slot.transform);
+            _arrows.Add(arrow);
             arrow.GetComponent<Image>().sprite = arrowSprites[(int)pattern.Item1];
             var rect = arrow.GetComponent<RectTransform>();
             rect.anchorMin = new Vector2(0.5f, 0.5f);
@@ -40,10 +43,12 @@ public class QTEPrompt: MonoBehaviour
             var image = _spawnedSlots[i].GetComponent<Image>();
             if (i < progress)
             {
+                _arrows[i].GetComponent<Image>().color = Color.darkGray; // 進行済みの矢印は灰色
                 image.color = Color.green; // 進行済みのスロットは緑色
             }
             else
             {
+                _arrows[i].GetComponent<Image>().color = Color.white; // 未進行の矢印はそのまま
                 image.color = needShift[i] ? Color.orange : Color.white; // Shiftが必要なスロットは赤色、そうでないスロットは白色
             }
         }
