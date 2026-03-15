@@ -258,7 +258,7 @@ class QTEManager: MonoBehaviour
         Debug.Log($"次のQTEアクション: {string.Join(", ", System.Linq.Enumerable.Select(currentQTEAction.inputPatterns, p => $"{p.Item1}{(p.Item2 ? "+Shift" : "")}"))}, 制限時間: {qteTimeLimit:F2}秒");
         onTimeLimitReset.OnNext(qteTimeLimit);
     }
-    private void PlayAnimation()
+    private async void PlayAnimation()
     {
         // とりあえず４つのアニメーションの中からランダムに再生する
         int animIndex = Random.Range(0, 4);
@@ -271,7 +271,12 @@ class QTEManager: MonoBehaviour
         else if (animIndex == 1)
         {
             playerAnimator.SetTrigger("Cyclone");
-            if (cycloneAudio != null) cycloneAudio.Play();
+            if (cycloneAudio != null)
+            {
+                cycloneAudio.Play();
+                await UniTask.Delay(1680, cancellationToken: destroyCancellationToken);
+                kickAudio.Play();
+            }
         }
         else if (animIndex == 2)
         {
