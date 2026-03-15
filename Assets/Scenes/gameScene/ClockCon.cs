@@ -59,7 +59,8 @@ public class ClockCon : MonoBehaviour
 		}
 		finally
 		{
-			transform.position = initialPosition; // 元の位置に戻す
+            // 既にオブジェクトが削除されている可能性があるため、nullチェックを行う
+            if (this != null) transform.position = initialPosition; // 元の位置に戻す
 			audioSource.Stop(); // 音を止める
 		}
 	}
