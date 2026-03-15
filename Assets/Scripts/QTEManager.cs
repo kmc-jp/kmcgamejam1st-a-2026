@@ -73,6 +73,7 @@ class QTEManager: MonoBehaviour
     public Subject<int> onComboUpdated = new(); // コンボ数がアップデートされたとき
     public Subject<Unit> onQTECompleted = new(); // QTEが成功したとき
     public Subject<Unit> onQTEFailed = new(); // QTEが失敗したとき
+    public ReactiveProperty<int> CountOfQTEs { get; private set; } = new(0);
 
 	[SerializeField] GameManager GameManager;
     [SerializeField] AudioSource smallSuccessES; // シーケンス一個ごとのSE
@@ -149,7 +150,7 @@ class QTEManager: MonoBehaviour
     {
         // 入力ストリームの監視を開始
         using var inputSubscription = OnInputAsObservable().Subscribe(input => OnPlayerInput(input));
-
+        CountOfQTEs.Value = 1;
         // ゲームオーバーになるまでのループ
         while (!ct.IsCancellationRequested)
         {
@@ -172,6 +173,7 @@ class QTEManager: MonoBehaviour
                 await UniTask.Delay(300, cancellationToken: ct); // 全ての入力を成功させた後、少し待機してから次のQTEに移る
                 // QTE成功
                 countOfQTEs++;
+                CountOfQTEs.Value++;
                 onComboUpdated.OnNext(comboCount + 1);
                 comboCount++; // コンボ数を増やす
                 bigSuccessES?.Play(); // シーケンス完成のSEを再生

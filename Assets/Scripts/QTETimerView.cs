@@ -7,6 +7,7 @@ public class QTETimerView : MonoBehaviour
 {
     [SerializeField] private TextMeshProUGUI secondText;
     [SerializeField] private TextMeshProUGUI milliSecondText;
+    [SerializeField] private TextMeshProUGUI qteCountText;
     [SerializeField] private Image timerRingSprite;
     [SerializeField] private QTEManager qteManager;
     private float maxTime;
@@ -37,7 +38,7 @@ public class QTETimerView : MonoBehaviour
                 .Where(_ => qteManager.gameObject.activeSelf) // QTEManagerがアクティブなときだけ
                 .Subscribe(_ => {
                 var timeLeft = qteManager.TimeLeft;
-                if (timeLeft < 0) // 無制限なら
+                if (timeLeft <= 0f) // 無制限なら
                 {
                     timerRingSprite.fillAmount = 0f;
                     secondText.text = "0.";
@@ -49,6 +50,11 @@ public class QTETimerView : MonoBehaviour
                 secondText.text = $"{Mathf.FloorToInt(timeLeft)}.";
                 milliSecondText.text = $"{milliSecond:000}";
             }).AddTo(this);
+
+            qteManager.CountOfQTEs.Subscribe(count => {
+                qteCountText.text = count.ToString("N0");
+            }
+            ).AddTo(this);
         }
     }
 }

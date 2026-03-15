@@ -62,8 +62,11 @@ public class GameUIView : MonoBehaviour
     public void ShowScoreAddition(int scoreAdd)
     {
         scorePlusText.text = $"+{scoreAdd:N0}";
+        var rect = scorePlusText.rectTransform;
+        rect.anchoredPosition = new Vector2(rect.anchoredPosition.x, -420f);
         scorePlusText.DOFade(1f, 0f);
         scorePlusText.DOFade(0f, 0.3f).SetEase(Ease.InCubic);
+        rect.DOAnchorPosY(30f, 0.3f).SetRelative(true);
     }
 
     void Update()
