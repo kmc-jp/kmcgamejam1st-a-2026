@@ -3,28 +3,17 @@ using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.SceneManagement;
 
-public class TitleSceneManager : MonoBehaviour
+public class ReTryButtonManager : MonoBehaviour
 {
-    [SerializeField] private InputAction AnyKeyAction;
     [SerializeField] private InputAction SAction;
     [SerializeField] private InputAction ShiftAction;
-
-    [SerializeField] private GameObject ExplainCanvas;
+    
     
     // Start is called once before the first execution of Update after the MonoBehaviour is created
-    void Start()
+    void OnEnable()
     {
-        AnyKeyAction?.Enable();
         SAction?.Enable();
         ShiftAction?.Enable();
-        ExplainCanvas.SetActive(false);
-        AnyKeyAction.performed += ActivateExplainCanvas;
-    }
-
-    public void ActivateExplainCanvas(InputAction.CallbackContext ctx)
-    {
-        ExplainCanvas.SetActive(true);
-        AnyKeyAction.performed -= ActivateExplainCanvas;
         SAction.performed += CheckShift;
         ShiftAction.performed += CheckS;
     }
@@ -35,7 +24,7 @@ public class TitleSceneManager : MonoBehaviour
         {
             SAction.performed -= CheckShift;
             ShiftAction.performed -= CheckS;
-            GotoPlayScene();
+            SceneReload();
         }
     }
 
@@ -45,19 +34,18 @@ public class TitleSceneManager : MonoBehaviour
         {
             SAction.performed -= CheckS;
             ShiftAction.performed -= CheckShift;
-            GotoPlayScene();
+            SceneReload();
         }
-    }
-
-    private void GotoPlayScene()
-    {
-        SceneManager.LoadScene("GameScene");
     }
 
     private void OnDestroy()
     {
-        AnyKeyAction?.Disable();
         SAction?.Disable();
         ShiftAction?.Disable();
+    }
+
+    public void SceneReload()
+    {
+        SceneManager.LoadScene("GameScene");
     }
 }
