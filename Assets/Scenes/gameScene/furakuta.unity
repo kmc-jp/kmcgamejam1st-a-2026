@@ -2020,6 +2020,10 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 7412933550282370100, guid: c68e42763cc294c4083d5a866b0190c2, type: 3}
+      propertyPath: m_Resource
+      value: 
+      objectReference: {fileID: 8300000, guid: e12b7c088953e4442b46222c0211cde1, type: 3}
     - target: {fileID: 9210673611056344861, guid: c68e42763cc294c4083d5a866b0190c2, type: 3}
       propertyPath: qTEPrompt
       value: 
