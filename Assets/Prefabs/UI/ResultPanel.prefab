@@ -202,7 +202,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: ReTry
+  m_text: Retry
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 45aa270aba5ad8d4bb05b8dd39a28cd4, type: 2}
   m_sharedMaterial: {fileID: 8063188214164025373, guid: 45aa270aba5ad8d4bb05b8dd39a28cd4, type: 2}
@@ -420,6 +420,24 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 904c18ca89783ee40b11818b78cf4ee2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::ReTryButtonManager
+  SAction:
+    m_Name: 
+    m_Type: 0
+    m_ExpectedControlType: 
+    m_Id: c48fb93f-cdb9-424f-93e0-14cb6276d1a9
+    m_Processors: 
+    m_Interactions: 
+    m_SingletonActionBindings: []
+    m_Flags: 0
+  ShiftAction:
+    m_Name: 
+    m_Type: 0
+    m_ExpectedControlType: 
+    m_Id: a14631da-d3c6-4949-88ce-1587dd23290a
+    m_Processors: 
+    m_Interactions: 
+    m_SingletonActionBindings: []
+    m_Flags: 0
 --- !u!1 &6386737818746743767
 GameObject:
   m_ObjectHideFlags: 0
