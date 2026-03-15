@@ -57,8 +57,14 @@ public class GameManager : MonoBehaviour
 		_State.Value = GameState.Playing;
 		QTEManagerObj.SetActive(true);
 
-		await GameEndTaskSource.Task;
+		await GameEndTaskSource.Task;//この間に1ゲームが完了する
 		GameEndTaskSource = null;
+
+		await UniTask.Delay(2000);
+		//ここでウィンドウなりシーンなりを入れ替える
+		//リザルト表示
+		Debug.Log("リザルト表示");
+		Debug.Log(_score.Value);
 	}
 	#endregion
 
@@ -66,14 +72,11 @@ public class GameManager : MonoBehaviour
 	public async UniTask QTEEnded(int combo)
 	{
 		QTEManagerObj.SetActive(false);
-		GameEndTaskSource.TrySetResult();
 		ClockCon.TurnOff();
 		BtnStart.interactable = true;
 		_State.Value = GameState.Final;
 		await AnimationStateManager.IntoBedAnimTask;
-		//リザルト表示
-		Debug.Log("リザルト表示");
-		Debug.Log(_score.Value);
+		GameEndTaskSource.TrySetResult();
 	}
 	#endregion
 	public void AddScore(int score)
