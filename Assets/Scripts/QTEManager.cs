@@ -62,6 +62,7 @@ class QTEManager: MonoBehaviour
     private int progress = 0; // 現在のQTEアクションの進行状況を管理する変数
     private int countOfQTEs = 0; // これまでに出現したQTEの数
     private int comboCount = 0;
+    private int maxComboCount = 0;
     private float qteTimeLimit = 1f; // QTEの時間制限（秒)
     public float TimeLeft => qteTimeLimit; // 外部から残り時間を参照できるようにするプロパティ
     private QTEAction currentQTEAction; // 現在のQTEアクション
@@ -184,6 +185,7 @@ class QTEManager: MonoBehaviour
                 CountOfQTEs.Value++;
                 onComboUpdated.OnNext(comboCount + 1);
                 comboCount++; // コンボ数を増やす
+                maxComboCount = Mathf.Max(maxComboCount, comboCount); // 最大コンボ数を更新
                 bigSuccessES?.Play(); // シーケンス完成のSEを再生
                 Debug.Log($"QTE成功！コンボ数: {comboCount }");
                 GameManager.AddScore(100 + comboCount * 10); // スコア加算
@@ -211,7 +213,7 @@ class QTEManager: MonoBehaviour
                 UnityroomApiClient.Instance.SendScore(0, GameManager.Score.CurrentValue, ScoreboardWriteMode.HighScoreDesc);
                 await UniTask.WaitForSeconds(3f);
                 resultUI.SetActive(true);
-                resultUI.gameObject.GetComponent<ResultUIView>().PlayResultUI(GameManager.Score.CurrentValue, comboCount).Forget();
+                resultUI.gameObject.GetComponent<ResultUIView>().PlayResultUI(GameManager.Score.CurrentValue, maxComboCount).Forget();
 				return; // QTEフェーズを終了
             }
         }
