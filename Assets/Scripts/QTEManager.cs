@@ -169,6 +169,7 @@ class QTEManager: MonoBehaviour
             }
             if (progress >= currentQTEAction.inputPatterns.Count)
             {
+                await UniTask.Delay(300, cancellationToken: ct); // 全ての入力を成功させた後、少し待機してから次のQTEに移る
                 // QTE成功
                 countOfQTEs++;
                 onComboUpdated.OnNext(comboCount + 1);
@@ -178,8 +179,8 @@ class QTEManager: MonoBehaviour
                 GameManager.AddScore(100 + comboCount * 10); // スコア加算
                 onQTECompleted.OnNext(Unit.Default);
 
-                // コンボ数が一定の倍数になったらアニメーションを再生
-                if (comboCount % 5 == 0)
+                // QTE成功数が一定の倍数になったらアニメーションを再生
+                if (countOfQTEs % 5 == 0)
                 {
                     qTEPrompt.gameObject.SetActive(false); // アニメーション中はQTEプロンプトを非表示にする
                     qTETimerView.gameObject.SetActive(false); // タイマービューも非表示にする
