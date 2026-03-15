@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Threading;
 using Cysharp.Threading.Tasks;
 using Unity.Properties;
+using unityroom.Api;
 
 public enum QTEInputType
 {
@@ -100,6 +101,8 @@ class QTEManager: MonoBehaviour
 
     private float[] initialTimeLimits = new float[6] {2f, 1.7f, 1.5f, 1.3f, 1.15f, 1f};
     private float[] TimeDecrease = new float[6] {0.1f, 0.085f, 0.075f, 0.065f, 0.0575f, 0.5f};
+
+    [SerializeField] private GameObject resultUI;
 
     void OnEnable()
     {
@@ -205,7 +208,10 @@ class QTEManager: MonoBehaviour
                 Debug.Log("時間切れ！QTE失敗");
                 onQTEFailed.OnNext(Unit.Default);
                 GameManager.QTEEnded(comboCount).Forget();
-
+                UnityroomApiClient.Instance.SendScore(0, GameManager.Score.CurrentValue, ScoreboardWriteMode.HighScoreDesc);
+                await UniTask.WaitForSeconds(3f);
+                resultUI.SetActive(true);
+                resultUI.gameObject.GetComponent<ResultUIView>().PlayResultUI(GameManager.Score.CurrentValue, comboCount).Forget();
 				return; // QTEフェーズを終了
             }
         }
@@ -258,7 +264,7 @@ class QTEManager: MonoBehaviour
         Debug.Log($"次のQTEアクション: {string.Join(", ", System.Linq.Enumerable.Select(currentQTEAction.inputPatterns, p => $"{p.Item1}{(p.Item2 ? "+Shift" : "")}"))}, 制限時間: {qteTimeLimit:F2}秒");
         onTimeLimitReset.OnNext(qteTimeLimit);
     }
-    private void PlayAnimation()
+    private async void PlayAnimation()
     {
         // とりあえず４つのアニメーションの中からランダムに再生する
         int animIndex = Random.Range(0, 4);
@@ -271,7 +277,12 @@ class QTEManager: MonoBehaviour
         else if (animIndex == 1)
         {
             playerAnimator.SetTrigger("Cyclone");
-            if (cycloneAudio != null) cycloneAudio.Play();
+            if (cycloneAudio != null)
+            {
+                cycloneAudio.Play();
+                await UniTask.Delay(1680, cancellationToken: destroyCancellationToken);
+                kickAudio.Play();
+            }
         }
         else if (animIndex == 2)
         {
