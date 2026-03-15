@@ -179,8 +179,8 @@ class QTEManager: MonoBehaviour
                 GameManager.AddScore(100 + comboCount * 10); // スコア加算
                 onQTECompleted.OnNext(Unit.Default);
 
-                // コンボ数が一定の倍数になったらアニメーションを再生
-                if (comboCount % 5 == 0)
+                // QTE成功数が一定の倍数になったらアニメーションを再生
+                if (countOfQTEs % 5 == 0)
                 {
                     qTEPrompt.gameObject.SetActive(false); // アニメーション中はQTEプロンプトを非表示にする
                     qTETimerView.gameObject.SetActive(false); // タイマービューも非表示にする
