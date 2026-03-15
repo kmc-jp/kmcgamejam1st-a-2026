@@ -169,6 +169,7 @@ class QTEManager: MonoBehaviour
             }
             if (progress >= currentQTEAction.inputPatterns.Count)
             {
+                await UniTask.Delay(300, cancellationToken: ct); // 全ての入力を成功させた後、少し待機してから次のQTEに移る
                 // QTE成功
                 countOfQTEs++;
                 onComboUpdated.OnNext(comboCount + 1);
